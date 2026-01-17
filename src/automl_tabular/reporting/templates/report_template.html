@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoML Report - {{ run_id }}</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+        
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --primary-light: #dbeafe;
+            --secondary: #10b981;
+            --secondary-light: #d1fae5;
+            --accent: #8b5cf6;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --white: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.7;
+            color: var(--gray-800);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            font-size: 15px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: var(--white);
+            border-radius: 16px;
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            padding: 48px 60px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+        }
+        
+        h1 {
+            font-size: 3em;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .subtitle {
+            font-size: 1.25em;
+            opacity: 0.95;
+            font-weight: 400;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .timestamp {
+            opacity: 0.85;
+            font-size: 0.95em;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .content {
+            padding: 48px 60px;
+        }
+        
+        section {
+            margin-bottom: 56px;
+        }
+        
+        section:last-child {
+            margin-bottom: 0;
+        }
+        
+        h2 {
+            color: var(--gray-900);
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 3px solid var(--gray-200);
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        h3 {
+            color: var(--gray-800);
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-top: 32px;
+            margin-bottom: 20px;
+            letter-spacing: -0.01em;
+        }
+        
+        h4 {
+            color: var(--gray-700);
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 8px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin: 28px 0;
+        }
+        
+        .info-card {
+            background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%);
+            padding: 28px;
+            border-radius: 12px;
+            border: 1px solid var(--gray-200);
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .info-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
+        }
+        
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--accent) 100%);
+            border-radius: 12px 0 0 12px;
+        }
+        
+        .info-card .value {
+            font-size: 2.25em;
+            font-weight: 700;
+            color: var(--primary);
+            margin-top: 4px;
+            letter-spacing: -0.02em;
+        }
+        
+        .table-container {
+            margin: 28px 0;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow);
+            background: var(--white);
+        }
+        
+        .table-wrapper {
+            max-height: 600px;
+            overflow-y: auto;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        
+        thead {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        thead tr {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            color: var(--white);
+            padding: 18px 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+        
+        td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--gray-100);
+            font-size: 0.95em;
+            color: var(--gray-700);
+        }
+        
+        tbody tr {
+            transition: background-color 0.2s ease;
+        }
+        
+        tbody tr:hover {
+            background-color: var(--gray-50);
+        }
+        
+        tbody tr:first-child {
+            background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+        
+        tbody tr:first-child td {
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .metric-highlight {
+            background: linear-gradient(135deg, var(--secondary) 0%, #059669 100%);
+            color: var(--white);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.95em;
+            display: inline-block;
+        }
+        
+        .plot-container {
+            margin: 36px 0;
+            text-align: center;
+            background: var(--gray-50);
+            padding: 32px;
+            border-radius: 12px;
+            border: 1px solid var(--gray-200);
+        }
+        
+        .plot-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            transition: transform 0.3s ease;
+        }
+        
+        .plot-container img:hover {
+            transform: scale(1.02);
+        }
+        
+        .summary-text {
+            background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%);
+            padding: 28px;
+            border-radius: 12px;
+            margin: 24px 0;
+            border-left: 4px solid var(--secondary);
+            box-shadow: var(--shadow-sm);
+            line-height: 1.8;
+        }
+        
+        .summary-text p {
+            margin-bottom: 16px;
+        }
+        
+        .summary-text p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .summary-text strong {
+            color: var(--gray-900);
+            font-weight: 600;
+        }
+        
+        .warning {
+            background: linear-gradient(135deg, var(--warning-light) 0%, #fef3c7 100%);
+            border-left: 4px solid var(--warning);
+            padding: 24px;
+            border-radius: 12px;
+            margin: 24px 0;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .warning h4 {
+            color: #92400e;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 12px;
+            text-transform: none;
+            letter-spacing: normal;
+        }
+        
+        .error {
+            background: linear-gradient(135deg, var(--danger-light) 0%, #fee2e2 100%);
+            border-left: 4px solid var(--danger);
+            padding: 24px;
+            border-radius: 12px;
+            margin: 24px 0;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        ul {
+            margin: 16px 0;
+            padding-left: 28px;
+        }
+        
+        li {
+            margin: 10px 0;
+            line-height: 1.7;
+        }
+        
+        li strong {
+            color: var(--gray-900);
+            font-weight: 600;
+        }
+        
+        code {
+            background: var(--gray-100);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-size: 0.9em;
+            color: var(--gray-800);
+            border: 1px solid var(--gray-200);
+        }
+        
+        pre {
+            background: var(--gray-900);
+            color: #e5e7eb;
+            padding: 24px;
+            border-radius: 12px;
+            overflow-x: auto;
+            margin: 16px 0;
+            box-shadow: var(--shadow-md);
+        }
+        
+        pre code {
+            background: transparent;
+            border: none;
+            color: inherit;
+            padding: 0;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        
+        .badge-classification {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            color: var(--white);
+            box-shadow: 0 2px 4px rgba(6, 182, 212, 0.3);
+        }
+        
+        .badge-regression {
+            background: linear-gradient(135deg, var(--accent) 0%, #7c3aed 100%);
+            color: var(--white);
+            box-shadow: 0 2px 4px rgba(139, 92, 246, 0.3);
+        }
+        
+        .alert-box {
+            background: linear-gradient(135deg, var(--primary-light) 0%, #dbeafe 100%);
+            border: 1px solid var(--primary);
+            border-left: 4px solid var(--primary);
+            padding: 20px 24px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .alert-box strong {
+            color: var(--primary-dark);
+        }
+        
+        footer {
+            background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-800) 100%);
+            color: var(--gray-300);
+            padding: 40px 60px;
+            text-align: center;
+            border-top: 4px solid var(--primary);
+        }
+        
+        footer p {
+            margin: 8px 0;
+            font-size: 0.95em;
+        }
+        
+        footer strong {
+            color: var(--white);
+            font-weight: 600;
+        }
+        
+        /* Scrollbar styling */
+        .table-wrapper::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        
+        .table-wrapper::-webkit-scrollbar-track {
+            background: var(--gray-100);
+        }
+        
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: var(--gray-400);
+            border-radius: 5px;
+        }
+        
+        .table-wrapper::-webkit-scrollbar-thumb:hover {
+            background: var(--gray-500);
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 10px;
+            }
+            
+            header {
+                padding: 32px 24px;
+            }
+            
+            .content {
+                padding: 32px 24px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            h2 {
+                font-size: 1.5em;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            footer {
+                padding: 32px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 AutoML Report</h1>
+            <p class="subtitle">Automated Machine Learning Analysis</p>
+            <p class="timestamp">Generated: {{ timestamp }}</p>
+        </header>
+
+        <div class="content">
+            <!-- Executive Summary -->
+            <section>
+                <h2>📊 Executive Summary</h2>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h4>Problem Type</h4>
+                        <div class="value">
+                            <span class="badge badge-{{ problem_type }}">{{ problem_type|title }}</span>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <h4>Recommended Model</h4>
+                        <div class="value" style="font-size: 1.4em;">{{ best_model_name }}</div>
+                    </div>
+                    <div class="info-card">
+                        <h4>{{ metric_name|upper }}</h4>
+                        <div class="value">{{ "%.4f"|format(metric_value) }}</div>
+                    </div>
+                    <div class="info-card">
+                        <h4>Total Models Tried</h4>
+                        <div class="value">{{ total_models_tried }}</div>
+                    </div>
+                </div>
+                
+                {% if selection_info.is_tie %}
+                <div class="alert-box">
+                    <h3 style="margin-top: 0; color: var(--primary-dark); font-size: 1.3em;">💡 Model Selection Insight</h3>
+                    <p>The AutoML search found <strong>{{ num_top_contenders }} additional models</strong> within {{ "%.1f"|format(selection_info.tolerance_percent) }}% of the best {{ selection_info.metric_name|upper }} (beyond the best model itself).</p>
+                    <p><strong>Best by raw metric:</strong> {{ selection_info.best_by_metric }} achieved {{ selection_info.metric_name|upper }} of <strong>{{ "%.4f"|format(selection_info.best_metric_value) }}</strong>.</p>
+                    <p><strong>Recommended model:</strong> {{ best_model_name }} ({{ "%.4f"|format(selection_info.recommended_metric_value) }}) is preferred {{ selection_info.reason_text }}</p>
+                    <p style="margin-bottom: 0;">
+                        <strong>Performance difference:</strong> {{ "%.4f"|format(selection_info.margin) }} ({{ "%.2f"|format(selection_info.margin * 100) }}%)
+                        — within the {{ "%.1f"|format(selection_info.tolerance_percent) }}% tolerance threshold, indicating no statistically meaningful difference on this dataset size.
+                    </p>
+                </div>
+                {% endif %}
+            </section>
+
+            <!-- Methodology Summary -->
+            <section>
+                <h2>🔬 Methodology Summary</h2>
+                <div class="summary-text" style="border-left-color: var(--accent);">
+                    <ul style="margin: 0;">
+                        <li><strong>Train/Validation Split:</strong> {{ train_val_split|default("80/20") }} stratified by target</li>
+                        <li><strong>Primary Metric:</strong> {{ metric_name|upper }} on the validation set</li>
+                        <li><strong>Cross-Validation:</strong> {{ cv_folds|default("3") }}-fold CV during hyperparameter search</li>
+                        <li><strong>Hyperparameter Search:</strong> Optuna with {{ total_trials|default(total_models_tried) }} trials across {{ num_model_families|default(4) }} model families</li>
+                        <li><strong>Preprocessing:</strong> Median imputation for numeric features, most-frequent imputation + one-hot encoding for categorical features</li>
+                        <li><strong>Model Selection:</strong> Tolerance-based selection ({{ "%.1f"|format(selection_info.tolerance_percent) }}%) with simplicity tie-breaking</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Dataset Information -->
+            <section>
+                <h2>📁 Dataset Information</h2>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h4>Total Samples</h4>
+                        <div class="value">{{ "{:,}".format(n_rows) }}</div>
+                    </div>
+                    <div class="info-card">
+                        <h4>Total Features</h4>
+                        <div class="value">{{ n_features }}</div>
+                    </div>
+                    <div class="info-card">
+                        <h4>Target Column</h4>
+                        <div class="value" style="font-size: 1.4em;">{{ target_column }}</div>
+                    </div>
+                </div>
+                
+                {% if warnings %}
+                <div class="warning">
+                    <h4>⚠️ Data Quality Warnings</h4>
+                    <ul>
+                    {% for warning in warnings %}
+                        <li>{{ warning }}</li>
+                    {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </section>
+
+            <!-- Model Leaderboard -->
+            <section>
+                <h2>🏆 Model Leaderboard</h2>
+                <p style="margin-bottom: 20px; color: var(--gray-600);">The following models were evaluated. The table shows the top performers ranked by {{ metric_name }}.</p>
+                
+                {% if selection_info.is_tie %}
+                <div class="alert-box" style="margin-bottom: 24px;">
+                    <strong>Note:</strong> Models highlighted in blue are within {{ "%.1f"|format(selection_info.tolerance_percent) }}% ({{ selection_info.tolerance }}) of the best performance and are considered <strong>top contenders</strong> with comparable accuracy.
+                </div>
+                {% endif %}
+                
+                <div class="table-container">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Model</th>
+                                    <th>{{ metric_name|upper }}</th>
+                                    <th>Training Time (s)</th>
+                                    <th>Top Contender</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for result in leaderboard %}
+                                <tr {% if result.is_top_contender %}style="background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%); border-left: 4px solid var(--primary);"{% endif %}>
+                                    <td><strong>{{ result.rank }}</strong></td>
+                                    <td><strong>{{ result.model }}</strong></td>
+                                    <td>
+                                        {% if result.rank == 1 %}
+                                        <span class="metric-highlight">{{ "%.4f"|format(result.score) }}</span>
+                                        {% else %}
+                                        {{ "%.4f"|format(result.score) }}
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ "%.2f"|format(result.train_time_sec) }}</td>
+                                    <td>
+                                        {% if result.rank == 1 %}
+                                        <span class="badge" style="background: linear-gradient(135deg, var(--secondary) 0%, #059669 100%); color: white; font-size: 0.75em;">Best</span>
+                                        {% elif result.is_top_contender %}
+                                        <span class="badge" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); color: white; font-size: 0.75em;">Yes</span>
+                                        {% else %}
+                                        <span style="color: var(--gray-400);">No</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                {% if model_family_summary %}
+                <div style="margin-top: 40px;">
+                    <h3>📊 Model Family Performance Summary</h3>
+                    <p style="margin-bottom: 20px; color: var(--gray-600);">This table shows aggregated performance statistics for each model family across all hyperparameter configurations tested.</p>
+                    <div class="table-container">
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Model Family</th>
+                                        <th>Best {{ metric_name|upper }}</th>
+                                        <th>Mean {{ metric_name|upper }}</th>
+                                        <th>Trials</th>
+                                        <th>Avg Time (s)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for family in model_family_summary %}
+                                    <tr>
+                                        <td><strong>{{ family.model_family }}</strong></td>
+                                        <td><strong>{{ "%.4f"|format(family.best_score) }}</strong></td>
+                                        <td>{{ "%.4f"|format(family.mean_score) }}</td>
+                                        <td>{{ family.num_trials }}</td>
+                                        <td>{{ "%.2f"|format(family.avg_time) }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </section>
+
+            <!-- Best Model Details -->
+            <section>
+                <h2>🎯 Best Model Details</h2>
+                <div class="summary-text" style="border-left-color: var(--primary);">
+                    {{ model_summary|safe }}
+                </div>
+            </section>
+
+            <!-- Feature Importance -->
+            {% if feature_importance_plot %}
+            <section>
+                <h2>🔍 Feature Importance</h2>
+                <div class="summary-text" style="border-left-color: var(--accent);">
+                    {{ feature_importance_summary|safe }}
+                </div>
+                
+                <div class="plot-container">
+                    <img src="{{ feature_importance_plot }}" alt="Feature Importance Plot">
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- Data Visualizations -->
+            <section>
+                <h2>📈 Data Visualizations</h2>
+                
+                {% if target_distribution_plot %}
+                <h3>Target Distribution</h3>
+                <div class="plot-container">
+                    <img src="{{ target_distribution_plot }}" alt="Target Distribution">
+                </div>
+                {% endif %}
+                
+                {% if model_comparison_plot %}
+                <h3>Model Performance Comparison</h3>
+                <div class="plot-container">
+                    <img src="{{ model_comparison_plot }}" alt="Model Comparison">
+                </div>
+                {% endif %}
+                
+                {% if missing_data_plot %}
+                <h3>Missing Data Analysis</h3>
+                <div class="plot-container">
+                    <img src="{{ missing_data_plot }}" alt="Missing Data">
+                </div>
+                {% endif %}
+                
+                {% if confusion_matrix_plot %}
+                <h3>Confusion Matrix</h3>
+                <div class="plot-container">
+                    <img src="{{ confusion_matrix_plot }}" alt="Confusion Matrix">
+                </div>
+                {% endif %}
+            </section>
+
+            <!-- Recommendations -->
+            {% if recommendations %}
+            <section>
+                <h2>💡 Recommendations</h2>
+                <div class="summary-text" style="border-left-color: var(--warning);">
+                    {{ recommendations|safe }}
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- Model Export -->
+            <section>
+                <h2>💾 Model Export</h2>
+                <p style="margin-bottom: 16px;">The trained model and preprocessing pipeline have been saved to:</p>
+                <code style="padding: 8px 12px; display: inline-block;">{{ model_path }}</code>
+                
+                <h3>How to Use the Saved Model</h3>
+                <div class="summary-text" style="border-left-color: var(--secondary);">
+                    <p style="margin-bottom: 12px;">To load and use this model for predictions:</p>
+                    <pre><code>import joblib
+import pandas as pd
+
+# Load the model
+pipeline = joblib.load('{{ model_path }}')
+
+# Load new data
+new_data = pd.read_csv('your_data.csv')
+
+# Make predictions
+predictions = pipeline.predict(new_data)
+</code></pre>
+                </div>
+            </section>
+        </div>
+
+        <footer>
+            <p>Generated by <strong>AutoML Tabular</strong> v0.1.0</p>
+            <p>Explainable AutoML for Tabular Data</p>
+        </footer>
+    </div>
+</body>
+</html>

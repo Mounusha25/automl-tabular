@@ -1,0 +1,1825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoML Report - 20260110_005303</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        
+        header {
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #007bff;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        h2 {
+            color: #007bff;
+            font-size: 1.8em;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            color: #495057;
+            font-size: 1.3em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .info-card {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .info-card h4 {
+            color: #495057;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .info-card .value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #007bff;
+        }
+        
+        .table-container {
+            max-height: 500px;
+            overflow-y: auto;
+            overflow-x: auto;
+            margin: 20px 0;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+            background-color: white;
+        }
+        
+        thead {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
+        }
+        
+        tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        tbody tr:first-child {
+            background-color: #e7f3ff;
+            font-weight: bold;
+        }
+        
+        .metric-highlight {
+            background-color: #28a745;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .plot-container {
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        .plot-container img {
+            max-width: 85%;
+            height: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .summary-text {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border-left: 4px solid #28a745;
+        }
+        
+        .warning {
+            background-color: #fff3cd;
+            border-left-color: #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            border-left-color: #dc3545;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            border-left: 4px solid #dc3545;
+        }
+        
+        ul {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        li {
+            margin: 8px 0;
+        }
+        
+        .timestamp {
+            color: #666;
+            font-size: 0.9em;
+            font-style: italic;
+        }
+        
+        footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+            text-align: center;
+            color: #666;
+        }
+        
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+        
+        .badge-classification {
+            background-color: #17a2b8;
+            color: white;
+        }
+        
+        .badge-regression {
+            background-color: #6f42c1;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 AutoML Report</h1>
+            <p class="subtitle">Automated Machine Learning Results</p>
+            <p class="timestamp">Generated: 2026-01-10 00:56:32</p>
+        </header>
+
+        <!-- Executive Summary -->
+        <section>
+            <h2>📊 Executive Summary</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>Problem Type</h4>
+                    <div class="value">
+                        <span class="badge badge-classification">Classification</span>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <h4>Recommended Model</h4>
+                    <div class="value">lightgbm</div>
+                </div>
+                <div class="info-card">
+                    <h4>ROC_AUC</h4>
+                    <div class="value">0.9266</div>
+                </div>
+                <div class="info-card">
+                    <h4>Total Models Tried</h4>
+                    <div class="value">80</div>
+                </div>
+            </div>
+            
+            
+            <div class="summary-text" style="border-left-color: #17a2b8;">
+                <h3 style="margin-top: 0; color: #17a2b8;">💡 Model Selection Insight</h3>
+                <p>The AutoML search found <strong>23 additional models</strong> within 0.5% of the best ROC_AUC (beyond the best model itself).</p>
+                <p><strong>Best by raw metric:</strong> lightgbm achieved ROC_AUC of <strong>0.9266</strong>.</p>
+                <p><strong>Recommended model:</strong> lightgbm (0.9266) is preferred due to its <strong>simplicity and interpretability</strong>.</p>
+                <p style="margin-bottom: 0;">
+                    <strong>Performance difference:</strong> 0.0000 (0.00%)
+                    — within the 0.5% tolerance threshold, indicating no statistically meaningful difference on this dataset size.
+                </p>
+            </div>
+            
+        </section>
+
+        <!-- Methodology Summary -->
+        <section>
+            <h2>🔬 Methodology Summary</h2>
+            <div class="summary-text" style="background-color: #f8f9fa; padding: 20px; border-radius: 8px;">
+                <ul style="margin: 0;">
+                    <li><strong>Train/Validation Split:</strong> 80/20 stratified by target</li>
+                    <li><strong>Primary Metric:</strong> ROC_AUC on the validation set</li>
+                    <li><strong>Cross-Validation:</strong> 3-fold CV during hyperparameter search</li>
+                    <li><strong>Hyperparameter Search:</strong> Optuna with 80 trials across 4 model families</li>
+                    <li><strong>Preprocessing:</strong> Median imputation for numeric features, most-frequent imputation + one-hot encoding for categorical features</li>
+                    <li><strong>Model Selection:</strong> Tolerance-based selection (0.5%) with simplicity tie-breaking</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Dataset Information -->
+        <section>
+            <h2>📁 Dataset Information</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>Total Samples</h4>
+                    <div class="value">32,561</div>
+                </div>
+                <div class="info-card">
+                    <h4>Total Features</h4>
+                    <div class="value">14</div>
+                </div>
+                <div class="info-card">
+                    <h4>Target Column</h4>
+                    <div class="value" style="font-size: 1.2em;">income</div>
+                </div>
+            </div>
+            
+            
+            <div class="warning">
+                <h4>⚠️ Data Quality Warnings</h4>
+                <ul>
+                
+                    <li>Dataset contains 24 duplicate rows (0.1%)</li>
+                
+                </ul>
+            </div>
+            
+        </section>
+
+        <!-- Model Leaderboard -->
+        <section>
+            <h2>🏆 Model Leaderboard</h2>
+            <p>The following models were evaluated. The table shows the top performers ranked by roc_auc.</p>
+            
+            
+            <div style="background-color: #e7f3ff; padding: 10px; border-radius: 4px; margin-bottom: 15px;">
+                <strong>Note:</strong> Models highlighted in blue are within 0.5% (0.005) of the best performance and are considered <strong>top contenders</strong> with comparable accuracy.
+            </div>
+            
+            
+            <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Model</th>
+                        <th>ROC_AUC</th>
+                        <th>Training Time (s)</th>
+                        <th>Top Contender</th>
+                    </tr>
+                </thead>
+                <tbody>
+                
+                    <tr >
+                        <td>1</td>
+                        <td>lightgbm</td>
+                        <td>
+                            
+                            <span class="metric-highlight">0.9266</span>
+                            
+                        </td>
+                        <td>4.12</td>
+                        <td>
+                            
+                            <span class="badge" style="background-color: #28a745; color: white; font-size: 0.75em;">Best</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr style="background-color: #e7f3ff; border-left: 4px solid #17a2b8;">
+                        <td>2</td>
+                        <td>lightgbm</td>
+                        <td>
+                            
+                            0.9266
+                            
+                        </td>
+                        <td>3.97</td>
+                        <td>
+                            
+                            <span class="badge" style="background-color: #17a2b8; color: white; font-size: 0.75em;">Yes</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr style="background-color: #e7f3ff; border-left: 4px solid #17a2b8;">
+                        <td>3</td>
+                        <td>lightgbm</td>
+                        <td>
+                            
+                            0.9266
+                            
+                        </td>
+                        <td>4.45</td>
+                        <td>
+                            
+                            <span class="badge" style="background-color: #17a2b8; color: white; font-size: 0.75em;">Yes</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr style="background-color: #e7f3ff; border-left: 4px solid #17a2b8;">
+                        <td>4</td>
+                        <td>lightgbm</td>
+                        <td>
+                            
+                            0.9266
+                            
+                        </td>
+                        <td>4.16</td>
+                        <td>
+                            
+                            <span class="badge" style="background-color: #17a2b8; color: white; font-size: 0.75em;">Yes</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr style="background-color: #e7f3ff; border-left: 4px solid #17a2b8;">
+                        <td>5</td>
+                        <td>lightgbm</td>
+                        <td>
+                            
+                            0.9266
+                            
+                        </td>
+                        <td>4.82</td>
+                        <td>
+                            
+                            <span class="badge" style="background-color: #17a2b8; color: white; font-size: 0.75em;">Yes</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr style="background-color: #e7f3ff; border-left: 4px solid #17a2b8;">
+                        <td>6</td>
+                        <td>lightgbm</td>
+                        <td>
+                            
+                            0.9266
+                            
+                        </td>
+                        <td>4.68</td>
+                        <td>
+                            
+                            <span class="badge" style="background-color: #17a2b8; color: white; font-size: 0.75em;">Yes</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr style="background-color: #e7f3ff; border-left: 4px solid #17a2b8;">
+                        <td>7</td>
+                        <td>lightgbm</td>
+                        <td>
+                            
+                            0.9266
+                            
+                        </td>
+                        <td>4.19</td>
+                        <td>
+                            
+                            <span class="badge" style="background-color: #17a2b8; color: white; font-size: 0.75em;">Yes</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr style="background-color: #e7f3ff; border-left: 4px solid #17a2b8;">
+                        <td>8</td>
+                        <td>lightgbm</td>
+                        <td>
+                            
+                            0.9265
+                            
+                        </td>
+                        <td>2.42</td>
+                        <td>
+                            
+                            <span class="badge" style="background-color: #17a2b8; color: white; font-size: 0.75em;">Yes</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr style="background-color: #e7f3ff; border-left: 4px solid #17a2b8;">
+                        <td>9</td>
+                        <td>lightgbm</td>
+                        <td>
+                            
+                            0.9265
+                            
+                        </td>
+                        <td>0.62</td>
+                        <td>
+                            
+                            <span class="badge" style="background-color: #17a2b8; color: white; font-size: 0.75em;">Yes</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr style="background-color: #e7f3ff; border-left: 4px solid #17a2b8;">
+                        <td>10</td>
+                        <td>xgboost</td>
+                        <td>
+                            
+                            0.9264
+                            
+                        </td>
+                        <td>1.54</td>
+                        <td>
+                            
+                            <span class="badge" style="background-color: #17a2b8; color: white; font-size: 0.75em;">Yes</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr style="background-color: #e7f3ff; border-left: 4px solid #17a2b8;">
+                        <td>11</td>
+                        <td>xgboost</td>
+                        <td>
+                            
+                            0.9264
+                            
+                        </td>
+                        <td>1.49</td>
+                        <td>
+                            
+                            <span class="badge" style="background-color: #17a2b8; color: white; font-size: 0.75em;">Yes</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr style="background-color: #e7f3ff; border-left: 4px solid #17a2b8;">
+                        <td>12</td>
+                        <td>xgboost</td>
+                        <td>
+                            
+                            0.9264
+                            
+                        </td>
+                        <td>1.50</td>
+                        <td>
+                            
+                            <span class="badge" style="background-color: #17a2b8; color: white; font-size: 0.75em;">Yes</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr style="background-color: #e7f3ff; border-left: 4px solid #17a2b8;">
+                        <td>13</td>
+                        <td>xgboost</td>
+                        <td>
+                            
+                            0.9264
+                            
+                        </td>
+                        <td>1.48</td>
+                        <td>
+                            
+                            <span class="badge" style="background-color: #17a2b8; color: white; font-size: 0.75em;">Yes</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr style="background-color: #e7f3ff; border-left: 4px solid #17a2b8;">
+                        <td>14</td>
+                        <td>xgboost</td>
+                        <td>
+                            
+                            0.9264
+                            
+                        </td>
+                        <td>1.44</td>
+                        <td>
+                            
+                            <span class="badge" style="background-color: #17a2b8; color: white; font-size: 0.75em;">Yes</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr style="background-color: #e7f3ff; border-left: 4px solid #17a2b8;">
+                        <td>15</td>
+                        <td>xgboost</td>
+                        <td>
+                            
+                            0.9264
+                            
+                        </td>
+                        <td>1.46</td>
+                        <td>
+                            
+                            <span class="badge" style="background-color: #17a2b8; color: white; font-size: 0.75em;">Yes</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr style="background-color: #e7f3ff; border-left: 4px solid #17a2b8;">
+                        <td>16</td>
+                        <td>xgboost</td>
+                        <td>
+                            
+                            0.9264
+                            
+                        </td>
+                        <td>1.48</td>
+                        <td>
+                            
+                            <span class="badge" style="background-color: #17a2b8; color: white; font-size: 0.75em;">Yes</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr style="background-color: #e7f3ff; border-left: 4px solid #17a2b8;">
+                        <td>17</td>
+                        <td>xgboost</td>
+                        <td>
+                            
+                            0.9257
+                            
+                        </td>
+                        <td>1.98</td>
+                        <td>
+                            
+                            <span class="badge" style="background-color: #17a2b8; color: white; font-size: 0.75em;">Yes</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr style="background-color: #e7f3ff; border-left: 4px solid #17a2b8;">
+                        <td>18</td>
+                        <td>lightgbm</td>
+                        <td>
+                            
+                            0.9254
+                            
+                        </td>
+                        <td>1.43</td>
+                        <td>
+                            
+                            <span class="badge" style="background-color: #17a2b8; color: white; font-size: 0.75em;">Yes</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr style="background-color: #e7f3ff; border-left: 4px solid #17a2b8;">
+                        <td>19</td>
+                        <td>lightgbm</td>
+                        <td>
+                            
+                            0.9253
+                            
+                        </td>
+                        <td>1.09</td>
+                        <td>
+                            
+                            <span class="badge" style="background-color: #17a2b8; color: white; font-size: 0.75em;">Yes</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr style="background-color: #e7f3ff; border-left: 4px solid #17a2b8;">
+                        <td>20</td>
+                        <td>xgboost</td>
+                        <td>
+                            
+                            0.9251
+                            
+                        </td>
+                        <td>0.67</td>
+                        <td>
+                            
+                            <span class="badge" style="background-color: #17a2b8; color: white; font-size: 0.75em;">Yes</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr style="background-color: #e7f3ff; border-left: 4px solid #17a2b8;">
+                        <td>21</td>
+                        <td>xgboost</td>
+                        <td>
+                            
+                            0.9247
+                            
+                        </td>
+                        <td>0.62</td>
+                        <td>
+                            
+                            <span class="badge" style="background-color: #17a2b8; color: white; font-size: 0.75em;">Yes</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr style="background-color: #e7f3ff; border-left: 4px solid #17a2b8;">
+                        <td>22</td>
+                        <td>xgboost</td>
+                        <td>
+                            
+                            0.9243
+                            
+                        </td>
+                        <td>0.71</td>
+                        <td>
+                            
+                            <span class="badge" style="background-color: #17a2b8; color: white; font-size: 0.75em;">Yes</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr style="background-color: #e7f3ff; border-left: 4px solid #17a2b8;">
+                        <td>23</td>
+                        <td>xgboost</td>
+                        <td>
+                            
+                            0.9241
+                            
+                        </td>
+                        <td>0.77</td>
+                        <td>
+                            
+                            <span class="badge" style="background-color: #17a2b8; color: white; font-size: 0.75em;">Yes</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr style="background-color: #e7f3ff; border-left: 4px solid #17a2b8;">
+                        <td>24</td>
+                        <td>lightgbm</td>
+                        <td>
+                            
+                            0.9224
+                            
+                        </td>
+                        <td>2.02</td>
+                        <td>
+                            
+                            <span class="badge" style="background-color: #17a2b8; color: white; font-size: 0.75em;">Yes</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>25</td>
+                        <td>xgboost</td>
+                        <td>
+                            
+                            0.9203
+                            
+                        </td>
+                        <td>1.75</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>26</td>
+                        <td>xgboost</td>
+                        <td>
+                            
+                            0.9202
+                            
+                        </td>
+                        <td>0.60</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>27</td>
+                        <td>xgboost</td>
+                        <td>
+                            
+                            0.9201
+                            
+                        </td>
+                        <td>0.43</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>28</td>
+                        <td>lightgbm</td>
+                        <td>
+                            
+                            0.9198
+                            
+                        </td>
+                        <td>0.62</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>29</td>
+                        <td>lightgbm</td>
+                        <td>
+                            
+                            0.9198
+                            
+                        </td>
+                        <td>0.65</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>30</td>
+                        <td>xgboost</td>
+                        <td>
+                            
+                            0.9181
+                            
+                        </td>
+                        <td>1.11</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>31</td>
+                        <td>lightgbm</td>
+                        <td>
+                            
+                            0.9180
+                            
+                        </td>
+                        <td>3.44</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>32</td>
+                        <td>lightgbm</td>
+                        <td>
+                            
+                            0.9173
+                            
+                        </td>
+                        <td>4.15</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>33</td>
+                        <td>random_forest</td>
+                        <td>
+                            
+                            0.9164
+                            
+                        </td>
+                        <td>6.22</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>34</td>
+                        <td>random_forest</td>
+                        <td>
+                            
+                            0.9162
+                            
+                        </td>
+                        <td>4.16</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>35</td>
+                        <td>random_forest</td>
+                        <td>
+                            
+                            0.9161
+                            
+                        </td>
+                        <td>6.02</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>36</td>
+                        <td>random_forest</td>
+                        <td>
+                            
+                            0.9160
+                            
+                        </td>
+                        <td>6.32</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>37</td>
+                        <td>random_forest</td>
+                        <td>
+                            
+                            0.9160
+                            
+                        </td>
+                        <td>4.12</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>38</td>
+                        <td>random_forest</td>
+                        <td>
+                            
+                            0.9159
+                            
+                        </td>
+                        <td>4.32</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>39</td>
+                        <td>random_forest</td>
+                        <td>
+                            
+                            0.9159
+                            
+                        </td>
+                        <td>4.24</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>40</td>
+                        <td>xgboost</td>
+                        <td>
+                            
+                            0.9157
+                            
+                        </td>
+                        <td>1.16</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>41</td>
+                        <td>random_forest</td>
+                        <td>
+                            
+                            0.9156
+                            
+                        </td>
+                        <td>4.27</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>42</td>
+                        <td>lightgbm</td>
+                        <td>
+                            
+                            0.9155
+                            
+                        </td>
+                        <td>5.35</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>43</td>
+                        <td>random_forest</td>
+                        <td>
+                            
+                            0.9155
+                            
+                        </td>
+                        <td>5.67</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>44</td>
+                        <td>xgboost</td>
+                        <td>
+                            
+                            0.9154
+                            
+                        </td>
+                        <td>0.59</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>45</td>
+                        <td>random_forest</td>
+                        <td>
+                            
+                            0.9154
+                            
+                        </td>
+                        <td>1.03</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>46</td>
+                        <td>random_forest</td>
+                        <td>
+                            
+                            0.9154
+                            
+                        </td>
+                        <td>2.36</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>47</td>
+                        <td>random_forest</td>
+                        <td>
+                            
+                            0.9153
+                            
+                        </td>
+                        <td>3.28</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>48</td>
+                        <td>random_forest</td>
+                        <td>
+                            
+                            0.9153
+                            
+                        </td>
+                        <td>5.66</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>49</td>
+                        <td>random_forest</td>
+                        <td>
+                            
+                            0.9148
+                            
+                        </td>
+                        <td>4.81</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>50</td>
+                        <td>random_forest</td>
+                        <td>
+                            
+                            0.9148
+                            
+                        </td>
+                        <td>3.81</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>51</td>
+                        <td>random_forest</td>
+                        <td>
+                            
+                            0.9128
+                            
+                        </td>
+                        <td>3.10</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>52</td>
+                        <td>random_forest</td>
+                        <td>
+                            
+                            0.9118
+                            
+                        </td>
+                        <td>0.75</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>53</td>
+                        <td>random_forest</td>
+                        <td>
+                            
+                            0.9115
+                            
+                        </td>
+                        <td>1.45</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>54</td>
+                        <td>random_forest</td>
+                        <td>
+                            
+                            0.9110
+                            
+                        </td>
+                        <td>4.34</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>55</td>
+                        <td>random_forest</td>
+                        <td>
+                            
+                            0.9105
+                            
+                        </td>
+                        <td>0.74</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>56</td>
+                        <td>lightgbm</td>
+                        <td>
+                            
+                            0.9104
+                            
+                        </td>
+                        <td>2.34</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>57</td>
+                        <td>lightgbm</td>
+                        <td>
+                            
+                            0.9055
+                            
+                        </td>
+                        <td>0.50</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>58</td>
+                        <td>xgboost</td>
+                        <td>
+                            
+                            0.9053
+                            
+                        </td>
+                        <td>0.47</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>59</td>
+                        <td>logistic_regression</td>
+                        <td>
+                            
+                            0.9049
+                            
+                        </td>
+                        <td>1.15</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>60</td>
+                        <td>logistic_regression</td>
+                        <td>
+                            
+                            0.9049
+                            
+                        </td>
+                        <td>0.96</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>61</td>
+                        <td>logistic_regression</td>
+                        <td>
+                            
+                            0.9049
+                            
+                        </td>
+                        <td>1.07</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>62</td>
+                        <td>logistic_regression</td>
+                        <td>
+                            
+                            0.9049
+                            
+                        </td>
+                        <td>1.08</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>63</td>
+                        <td>logistic_regression</td>
+                        <td>
+                            
+                            0.9049
+                            
+                        </td>
+                        <td>0.94</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>64</td>
+                        <td>logistic_regression</td>
+                        <td>
+                            
+                            0.9049
+                            
+                        </td>
+                        <td>1.09</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>65</td>
+                        <td>logistic_regression</td>
+                        <td>
+                            
+                            0.9049
+                            
+                        </td>
+                        <td>1.06</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>66</td>
+                        <td>logistic_regression</td>
+                        <td>
+                            
+                            0.9049
+                            
+                        </td>
+                        <td>0.99</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>67</td>
+                        <td>logistic_regression</td>
+                        <td>
+                            
+                            0.9049
+                            
+                        </td>
+                        <td>16.97</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>68</td>
+                        <td>logistic_regression</td>
+                        <td>
+                            
+                            0.9049
+                            
+                        </td>
+                        <td>0.78</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>69</td>
+                        <td>logistic_regression</td>
+                        <td>
+                            
+                            0.9047
+                            
+                        </td>
+                        <td>17.70</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>70</td>
+                        <td>logistic_regression</td>
+                        <td>
+                            
+                            0.9047
+                            
+                        </td>
+                        <td>2.33</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>71</td>
+                        <td>logistic_regression</td>
+                        <td>
+                            
+                            0.9047
+                            
+                        </td>
+                        <td>0.34</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>72</td>
+                        <td>logistic_regression</td>
+                        <td>
+                            
+                            0.9046
+                            
+                        </td>
+                        <td>1.04</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>73</td>
+                        <td>logistic_regression</td>
+                        <td>
+                            
+                            0.9046
+                            
+                        </td>
+                        <td>1.92</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>74</td>
+                        <td>logistic_regression</td>
+                        <td>
+                            
+                            0.9038
+                            
+                        </td>
+                        <td>0.40</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>75</td>
+                        <td>logistic_regression</td>
+                        <td>
+                            
+                            0.9016
+                            
+                        </td>
+                        <td>1.24</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>76</td>
+                        <td>logistic_regression</td>
+                        <td>
+                            
+                            0.9007
+                            
+                        </td>
+                        <td>0.76</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>77</td>
+                        <td>xgboost</td>
+                        <td>
+                            
+                            0.8919
+                            
+                        </td>
+                        <td>0.75</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>78</td>
+                        <td>logistic_regression</td>
+                        <td>
+                            
+                            0.8907
+                            
+                        </td>
+                        <td>0.80</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>79</td>
+                        <td>lightgbm</td>
+                        <td>
+                            
+                            0.8907
+                            
+                        </td>
+                        <td>1.06</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr >
+                        <td>80</td>
+                        <td>logistic_regression</td>
+                        <td>
+                            
+                            0.8375
+                            
+                        </td>
+                        <td>0.16</td>
+                        <td>
+                            
+                            <span style="color: #999;">No</span>
+                            
+                        </td>
+                    </tr>
+                
+                </tbody>
+            </table>
+            </div>
+            
+            
+            <div style="margin-top: 30px;">
+                <h3>📊 Model Family Performance Summary</h3>
+                <p>This table shows aggregated performance statistics for each model family across all hyperparameter configurations tested.</p>
+                <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Model Family</th>
+                            <th>Best ROC_AUC</th>
+                            <th>Mean ROC_AUC</th>
+                            <th>Trials</th>
+                            <th>Avg Time (s)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    
+                        <tr>
+                            <td><strong>lightgbm</strong></td>
+                            <td>0.9266</td>
+                            <td>0.9205</td>
+                            <td>20</td>
+                            <td>2.80</td>
+                        </tr>
+                    
+                        <tr>
+                            <td><strong>xgboost</strong></td>
+                            <td>0.9264</td>
+                            <td>0.9208</td>
+                            <td>20</td>
+                            <td>1.10</td>
+                        </tr>
+                    
+                        <tr>
+                            <td><strong>random_forest</strong></td>
+                            <td>0.9164</td>
+                            <td>0.9146</td>
+                            <td>20</td>
+                            <td>3.83</td>
+                        </tr>
+                    
+                        <tr>
+                            <td><strong>logistic_regression</strong></td>
+                            <td>0.9049</td>
+                            <td>0.9003</td>
+                            <td>20</td>
+                            <td>2.64</td>
+                        </tr>
+                    
+                    </tbody>
+                </table>
+                </div>
+            </div>
+            
+        </section>
+
+        <!-- Best Model Details -->
+        <section>
+            <h2>🎯 Best Model Details</h2>
+            <div class="summary-text">
+                <h3>Best Model Summary</h3>
+<br>
+<p>The AutoML system selected <strong>lightgbm</strong> as the best-performing model for this classification task.</p>
+<br>
+<p>This model achieved a <strong>roc_auc</strong> score of **0.9266** on the validation set.</p>
+<br>
+<h3># Model Configuration</h3>
+<br>
+<p>The best hyperparameters found were:</p>
+<br>
+<ul>
+<li>**n_estimators**: 200</li>
+<li>**max_depth**: -1</li>
+<li>**learning_rate**: 0.05</li>
+<li>**num_leaves**: 31</li>
+<li>**subsample**: 0.8</li>
+</ul>
+<br>
+<h3># Training Details</h3>
+<br>
+<ul>
+<li>Training time: 4.12 seconds</li>
+</ul>
+            </div>
+        </section>
+
+        <!-- Feature Importance -->
+        
+        <section>
+            <h2>🔍 Feature Importance</h2>
+            <div class="summary-text">
+                <h3>Feature Importance Analysis</h3>
+<br>
+<p>The model identified the following 8 feature groups as most important for making predictions:</p>
+<br>
+<p>1. <strong>age</strong> (importance: 978.0000)</p>
+<p>2. <strong>fnlwgt</strong> (importance: 914.0000)</p>
+<p>3. <strong>occupation</strong> (13 encoded features, importance: 651.0000)</p>
+<p>4. <strong>hours-per-week</strong> (importance: 611.0000)</p>
+<p>5. <strong>capital-loss</strong> (importance: 565.0000)</p>
+<p>6. <strong>capital-gain</strong> (importance: 547.0000)</p>
+<p>7. <strong>education-num</strong> (importance: 462.0000)</p>
+<p>8. <strong>workclass</strong> (7 encoded features, importance: 264.0000)</p>
+<br>
+<p>*Note: High-cardinality identifier-like columns (e.g., Name, Ticket) were excluded from this analysis to avoid over-interpreting sparse one-hot categories.*</p>
+<br>
+            </div>
+            
+            <div class="plot-container">
+                <img src="plots/20260110_005303_feature_importance.png" alt="Feature Importance Plot">
+            </div>
+        </section>
+        
+
+        <!-- Data Visualizations -->
+        <section>
+            <h2>📈 Data Visualizations</h2>
+            
+            
+            <h3>Target Distribution</h3>
+            <div class="plot-container">
+                <img src="plots/20260110_005303_target_distribution.png" alt="Target Distribution">
+            </div>
+            
+            
+            
+            <h3>Model Performance Comparison</h3>
+            <div class="plot-container">
+                <img src="plots/20260110_005303_model_comparison.png" alt="Model Comparison">
+            </div>
+            
+            
+            
+            <h3>Missing Data Analysis</h3>
+            <div class="plot-container">
+                <img src="plots/20260110_005303_missing_data.png" alt="Missing Data">
+            </div>
+            
+            
+            
+            <h3>Confusion Matrix</h3>
+            <div class="plot-container">
+                <img src="plots/20260110_005303_confusion_matrix.png" alt="Confusion Matrix">
+            </div>
+            
+        </section>
+
+        <!-- Recommendations -->
+        
+        <section>
+            <h2>💡 Recommendations</h2>
+            <div class="summary-text">
+                <h3>Recommendations for Model Improvement</h3>
+<br>
+<ul>
+<li>**Feature engineering**: Consider creating new features based on domain knowledge or interactions between existing features.</li>
+<li>**Extended hyperparameter tuning**: Consider increasing the number of Optuna trials for more thorough hyperparameter search.</li>
+<li>**Monitor in production**: Once deployed, continuously monitor model performance and retrain periodically with new data.</li>
+</ul>
+            </div>
+        </section>
+        
+
+        <!-- Model Export -->
+        <section>
+            <h2>💾 Model Export</h2>
+            <p>The trained model and preprocessing pipeline have been saved to:</p>
+            <code>output/adult_income/models/20260110_005303_model.joblib</code>
+            
+            <h3>How to Use the Saved Model</h3>
+            <div class="summary-text">
+                <p>To load and use this model for predictions:</p>
+                <pre><code>
+import joblib
+import pandas as pd
+
+# Load the model
+pipeline = joblib.load('output/adult_income/models/20260110_005303_model.joblib')
+
+# Load new data
+new_data = pd.read_csv('your_data.csv')
+
+# Make predictions
+predictions = pipeline.predict(new_data)
+                </code></pre>
+            </div>
+        </section>
+
+        <footer>
+            <p>Generated by <strong>AutoML Tabular</strong> v0.1.0</p>
+            <p>Explainable AutoML for Tabular Data</p>
+        </footer>
+    </div>
+</body>
+</html>

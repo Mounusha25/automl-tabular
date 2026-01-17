@@ -1,0 +1,2089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoML Report - 20260113_190226</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+        
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --primary-light: #dbeafe;
+            --secondary: #10b981;
+            --secondary-light: #d1fae5;
+            --accent: #8b5cf6;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --white: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.7;
+            color: var(--gray-800);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            font-size: 15px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: var(--white);
+            border-radius: 16px;
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            padding: 48px 60px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+        }
+        
+        h1 {
+            font-size: 3em;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .subtitle {
+            font-size: 1.25em;
+            opacity: 0.95;
+            font-weight: 400;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .timestamp {
+            opacity: 0.85;
+            font-size: 0.95em;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .content {
+            padding: 48px 60px;
+        }
+        
+        section {
+            margin-bottom: 56px;
+        }
+        
+        section:last-child {
+            margin-bottom: 0;
+        }
+        
+        h2 {
+            color: var(--gray-900);
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 3px solid var(--gray-200);
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        h3 {
+            color: var(--gray-800);
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-top: 32px;
+            margin-bottom: 20px;
+            letter-spacing: -0.01em;
+        }
+        
+        h4 {
+            color: var(--gray-700);
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 8px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin: 28px 0;
+        }
+        
+        .info-card {
+            background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%);
+            padding: 28px;
+            border-radius: 12px;
+            border: 1px solid var(--gray-200);
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .info-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
+        }
+        
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--accent) 100%);
+            border-radius: 12px 0 0 12px;
+        }
+        
+        .info-card .value {
+            font-size: 2.25em;
+            font-weight: 700;
+            color: var(--primary);
+            margin-top: 4px;
+            letter-spacing: -0.02em;
+        }
+        
+        .table-container {
+            margin: 28px 0;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow);
+            background: var(--white);
+        }
+        
+        .table-wrapper {
+            max-height: 600px;
+            overflow-y: auto;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        
+        thead {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        thead tr {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            color: var(--white);
+            padding: 18px 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+        
+        td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--gray-100);
+            font-size: 0.95em;
+            color: var(--gray-700);
+        }
+        
+        tbody tr {
+            transition: background-color 0.2s ease;
+        }
+        
+        tbody tr:hover {
+            background-color: var(--gray-50);
+        }
+        
+        tbody tr:first-child {
+            background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+        
+        tbody tr:first-child td {
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .metric-highlight {
+            background: linear-gradient(135deg, var(--secondary) 0%, #059669 100%);
+            color: var(--white);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.95em;
+            display: inline-block;
+        }
+        
+        .plot-container {
+            margin: 36px 0;
+            text-align: center;
+            background: var(--gray-50);
+            padding: 32px;
+            border-radius: 12px;
+            border: 1px solid var(--gray-200);
+        }
+        
+        .plot-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            transition: transform 0.3s ease;
+        }
+        
+        .plot-container img:hover {
+            transform: scale(1.02);
+        }
+        
+        .summary-text {
+            background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%);
+            padding: 28px;
+            border-radius: 12px;
+            margin: 24px 0;
+            border-left: 4px solid var(--secondary);
+            box-shadow: var(--shadow-sm);
+            line-height: 1.8;
+        }
+        
+        .summary-text p {
+            margin-bottom: 16px;
+        }
+        
+        .summary-text p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .summary-text strong {
+            color: var(--gray-900);
+            font-weight: 600;
+        }
+        
+        .warning {
+            background: linear-gradient(135deg, var(--warning-light) 0%, #fef3c7 100%);
+            border-left: 4px solid var(--warning);
+            padding: 24px;
+            border-radius: 12px;
+            margin: 24px 0;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .warning h4 {
+            color: #92400e;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 12px;
+            text-transform: none;
+            letter-spacing: normal;
+        }
+        
+        .error {
+            background: linear-gradient(135deg, var(--danger-light) 0%, #fee2e2 100%);
+            border-left: 4px solid var(--danger);
+            padding: 24px;
+            border-radius: 12px;
+            margin: 24px 0;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        ul {
+            margin: 16px 0;
+            padding-left: 28px;
+        }
+        
+        li {
+            margin: 10px 0;
+            line-height: 1.7;
+        }
+        
+        li strong {
+            color: var(--gray-900);
+            font-weight: 600;
+        }
+        
+        code {
+            background: var(--gray-100);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-size: 0.9em;
+            color: var(--gray-800);
+            border: 1px solid var(--gray-200);
+        }
+        
+        pre {
+            background: var(--gray-900);
+            color: #e5e7eb;
+            padding: 24px;
+            border-radius: 12px;
+            overflow-x: auto;
+            margin: 16px 0;
+            box-shadow: var(--shadow-md);
+        }
+        
+        pre code {
+            background: transparent;
+            border: none;
+            color: inherit;
+            padding: 0;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        
+        .badge-classification {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            color: var(--white);
+            box-shadow: 0 2px 4px rgba(6, 182, 212, 0.3);
+        }
+        
+        .badge-regression {
+            background: linear-gradient(135deg, var(--accent) 0%, #7c3aed 100%);
+            color: var(--white);
+            box-shadow: 0 2px 4px rgba(139, 92, 246, 0.3);
+        }
+        
+        .alert-box {
+            background: linear-gradient(135deg, var(--primary-light) 0%, #dbeafe 100%);
+            border: 1px solid var(--primary);
+            border-left: 4px solid var(--primary);
+            padding: 20px 24px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .alert-box strong {
+            color: var(--primary-dark);
+        }
+        
+        footer {
+            background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-800) 100%);
+            color: var(--gray-300);
+            padding: 40px 60px;
+            text-align: center;
+            border-top: 4px solid var(--primary);
+        }
+        
+        footer p {
+            margin: 8px 0;
+            font-size: 0.95em;
+        }
+        
+        footer strong {
+            color: var(--white);
+            font-weight: 600;
+        }
+        
+        /* Scrollbar styling */
+        .table-wrapper::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        
+        .table-wrapper::-webkit-scrollbar-track {
+            background: var(--gray-100);
+        }
+        
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: var(--gray-400);
+            border-radius: 5px;
+        }
+        
+        .table-wrapper::-webkit-scrollbar-thumb:hover {
+            background: var(--gray-500);
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 10px;
+            }
+            
+            header {
+                padding: 32px 24px;
+            }
+            
+            .content {
+                padding: 32px 24px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            h2 {
+                font-size: 1.5em;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            footer {
+                padding: 32px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 AutoML Report</h1>
+            <p class="subtitle">Automated Machine Learning Analysis</p>
+            <p class="timestamp">Generated: 2026-01-13 19:03:32</p>
+        </header>
+
+        <div class="content">
+            <!-- Executive Summary -->
+            <section>
+                <h2>📊 Executive Summary</h2>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h4>Problem Type</h4>
+                        <div class="value">
+                            <span class="badge badge-classification">Classification</span>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <h4>Recommended Model</h4>
+                        <div class="value" style="font-size: 1.4em;">random_forest</div>
+                    </div>
+                    <div class="info-card">
+                        <h4>ACCURACY</h4>
+                        <div class="value">0.6880</div>
+                    </div>
+                    <div class="info-card">
+                        <h4>Total Models Tried</h4>
+                        <div class="value">80</div>
+                    </div>
+                </div>
+                
+                
+                <div class="alert-box">
+                    <h3 style="margin-top: 0; color: var(--primary-dark); font-size: 1.3em;">💡 Model Selection Insight</h3>
+                    <p>The AutoML search found <strong>6 additional models</strong> within 0.5% of the best ACCURACY (beyond the best model itself).</p>
+                    <p><strong>Best by raw metric:</strong> random_forest achieved ACCURACY of <strong>0.6880</strong>.</p>
+                    <p><strong>Recommended model:</strong> random_forest (0.6880) is preferred because it achieved the highest validation accuracy.</p>
+                    <p style="margin-bottom: 0;">
+                        <strong>Performance difference:</strong> 0.0000 (0.00%)
+                        — within the 0.5% tolerance threshold, indicating no statistically meaningful difference on this dataset size.
+                    </p>
+                </div>
+                
+            </section>
+
+            <!-- Methodology Summary -->
+            <section>
+                <h2>🔬 Methodology Summary</h2>
+                <div class="summary-text" style="border-left-color: var(--accent);">
+                    <ul style="margin: 0;">
+                        <li><strong>Train/Validation Split:</strong> 80/20 stratified by target</li>
+                        <li><strong>Primary Metric:</strong> ACCURACY on the validation set</li>
+                        <li><strong>Cross-Validation:</strong> 3-fold CV during hyperparameter search</li>
+                        <li><strong>Hyperparameter Search:</strong> Optuna with 80 trials across 4 model families</li>
+                        <li><strong>Preprocessing:</strong> Median imputation for numeric features, most-frequent imputation + one-hot encoding for categorical features</li>
+                        <li><strong>Model Selection:</strong> Tolerance-based selection (0.5%) with simplicity tie-breaking</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Dataset Information -->
+            <section>
+                <h2>📁 Dataset Information</h2>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h4>Total Samples</h4>
+                        <div class="value">1,599</div>
+                    </div>
+                    <div class="info-card">
+                        <h4>Total Features</h4>
+                        <div class="value">11</div>
+                    </div>
+                    <div class="info-card">
+                        <h4>Target Column</h4>
+                        <div class="value" style="font-size: 1.4em;">quality</div>
+                    </div>
+                </div>
+                
+                
+                <div class="warning">
+                    <h4>⚠️ Data Quality Warnings</h4>
+                    <ul>
+                    
+                        <li>Dataset contains 240 duplicate rows (15.0%)</li>
+                    
+                        <li>Severe class imbalance detected (ratio: 68.1:1). Stratified splitting is applied; consider using class weights or resampling if minority classes are important.</li>
+                    
+                    </ul>
+                </div>
+                
+            </section>
+
+            <!-- Model Leaderboard -->
+            <section>
+                <h2>🏆 Model Leaderboard</h2>
+                <p style="margin-bottom: 20px; color: var(--gray-600);">The following models were evaluated. The table shows the top performers ranked by accuracy.</p>
+                
+                
+                <div class="alert-box" style="margin-bottom: 24px;">
+                    <strong>Note:</strong> Models highlighted in blue are within 0.5% (0.005) of the best performance and are considered <strong>top contenders</strong> with comparable accuracy.
+                </div>
+                
+                
+                <div class="table-container">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Model</th>
+                                    <th>ACCURACY</th>
+                                    <th>Training Time (s)</th>
+                                    <th>Top Contender</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            
+                                <tr >
+                                    <td><strong>1</strong></td>
+                                    <td><strong>random_forest</strong></td>
+                                    <td>
+                                        
+                                        <span class="metric-highlight">0.6880</span>
+                                        
+                                    </td>
+                                    <td>0.39</td>
+                                    <td>
+                                        
+                                        <span class="badge" style="background: linear-gradient(135deg, var(--secondary) 0%, #059669 100%); color: white; font-size: 0.75em;">Best</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr style="background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%); border-left: 4px solid var(--primary);">
+                                    <td><strong>2</strong></td>
+                                    <td><strong>random_forest</strong></td>
+                                    <td>
+                                        
+                                        0.6872
+                                        
+                                    </td>
+                                    <td>0.40</td>
+                                    <td>
+                                        
+                                        <span class="badge" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); color: white; font-size: 0.75em;">Yes</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr style="background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%); border-left: 4px solid var(--primary);">
+                                    <td><strong>3</strong></td>
+                                    <td><strong>random_forest</strong></td>
+                                    <td>
+                                        
+                                        0.6865
+                                        
+                                    </td>
+                                    <td>0.39</td>
+                                    <td>
+                                        
+                                        <span class="badge" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); color: white; font-size: 0.75em;">Yes</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr style="background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%); border-left: 4px solid var(--primary);">
+                                    <td><strong>4</strong></td>
+                                    <td><strong>xgboost</strong></td>
+                                    <td>
+                                        
+                                        0.6857
+                                        
+                                    </td>
+                                    <td>0.13</td>
+                                    <td>
+                                        
+                                        <span class="badge" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); color: white; font-size: 0.75em;">Yes</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr style="background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%); border-left: 4px solid var(--primary);">
+                                    <td><strong>5</strong></td>
+                                    <td><strong>xgboost</strong></td>
+                                    <td>
+                                        
+                                        0.6857
+                                        
+                                    </td>
+                                    <td>0.13</td>
+                                    <td>
+                                        
+                                        <span class="badge" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); color: white; font-size: 0.75em;">Yes</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr style="background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%); border-left: 4px solid var(--primary);">
+                                    <td><strong>6</strong></td>
+                                    <td><strong>xgboost</strong></td>
+                                    <td>
+                                        
+                                        0.6857
+                                        
+                                    </td>
+                                    <td>0.13</td>
+                                    <td>
+                                        
+                                        <span class="badge" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); color: white; font-size: 0.75em;">Yes</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr style="background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%); border-left: 4px solid var(--primary);">
+                                    <td><strong>7</strong></td>
+                                    <td><strong>random_forest</strong></td>
+                                    <td>
+                                        
+                                        0.6857
+                                        
+                                    </td>
+                                    <td>0.47</td>
+                                    <td>
+                                        
+                                        <span class="badge" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); color: white; font-size: 0.75em;">Yes</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>8</strong></td>
+                                    <td><strong>random_forest</strong></td>
+                                    <td>
+                                        
+                                        0.6810
+                                        
+                                    </td>
+                                    <td>0.13</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>9</strong></td>
+                                    <td><strong>random_forest</strong></td>
+                                    <td>
+                                        
+                                        0.6802
+                                        
+                                    </td>
+                                    <td>0.25</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>10</strong></td>
+                                    <td><strong>random_forest</strong></td>
+                                    <td>
+                                        
+                                        0.6802
+                                        
+                                    </td>
+                                    <td>0.26</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>11</strong></td>
+                                    <td><strong>random_forest</strong></td>
+                                    <td>
+                                        
+                                        0.6787
+                                        
+                                    </td>
+                                    <td>0.40</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>12</strong></td>
+                                    <td><strong>xgboost</strong></td>
+                                    <td>
+                                        
+                                        0.6779
+                                        
+                                    </td>
+                                    <td>0.16</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>13</strong></td>
+                                    <td><strong>random_forest</strong></td>
+                                    <td>
+                                        
+                                        0.6763
+                                        
+                                    </td>
+                                    <td>0.21</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>14</strong></td>
+                                    <td><strong>random_forest</strong></td>
+                                    <td>
+                                        
+                                        0.6763
+                                        
+                                    </td>
+                                    <td>0.09</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>15</strong></td>
+                                    <td><strong>random_forest</strong></td>
+                                    <td>
+                                        
+                                        0.6747
+                                        
+                                    </td>
+                                    <td>0.28</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>16</strong></td>
+                                    <td><strong>random_forest</strong></td>
+                                    <td>
+                                        
+                                        0.6732
+                                        
+                                    </td>
+                                    <td>0.37</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>17</strong></td>
+                                    <td><strong>xgboost</strong></td>
+                                    <td>
+                                        
+                                        0.6732
+                                        
+                                    </td>
+                                    <td>0.27</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>18</strong></td>
+                                    <td><strong>random_forest</strong></td>
+                                    <td>
+                                        
+                                        0.6724
+                                        
+                                    </td>
+                                    <td>0.13</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>19</strong></td>
+                                    <td><strong>xgboost</strong></td>
+                                    <td>
+                                        
+                                        0.6708
+                                        
+                                    </td>
+                                    <td>0.12</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>20</strong></td>
+                                    <td><strong>xgboost</strong></td>
+                                    <td>
+                                        
+                                        0.6708
+                                        
+                                    </td>
+                                    <td>0.17</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>21</strong></td>
+                                    <td><strong>xgboost</strong></td>
+                                    <td>
+                                        
+                                        0.6692
+                                        
+                                    </td>
+                                    <td>0.32</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>22</strong></td>
+                                    <td><strong>xgboost</strong></td>
+                                    <td>
+                                        
+                                        0.6692
+                                        
+                                    </td>
+                                    <td>0.10</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>23</strong></td>
+                                    <td><strong>random_forest</strong></td>
+                                    <td>
+                                        
+                                        0.6685
+                                        
+                                    </td>
+                                    <td>0.37</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>24</strong></td>
+                                    <td><strong>xgboost</strong></td>
+                                    <td>
+                                        
+                                        0.6685
+                                        
+                                    </td>
+                                    <td>0.30</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>25</strong></td>
+                                    <td><strong>xgboost</strong></td>
+                                    <td>
+                                        
+                                        0.6685
+                                        
+                                    </td>
+                                    <td>0.29</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>26</strong></td>
+                                    <td><strong>lightgbm</strong></td>
+                                    <td>
+                                        
+                                        0.6677
+                                        
+                                    </td>
+                                    <td>1.26</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>27</strong></td>
+                                    <td><strong>lightgbm</strong></td>
+                                    <td>
+                                        
+                                        0.6677
+                                        
+                                    </td>
+                                    <td>1.27</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>28</strong></td>
+                                    <td><strong>lightgbm</strong></td>
+                                    <td>
+                                        
+                                        0.6677
+                                        
+                                    </td>
+                                    <td>1.24</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>29</strong></td>
+                                    <td><strong>lightgbm</strong></td>
+                                    <td>
+                                        
+                                        0.6677
+                                        
+                                    </td>
+                                    <td>1.26</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>30</strong></td>
+                                    <td><strong>lightgbm</strong></td>
+                                    <td>
+                                        
+                                        0.6677
+                                        
+                                    </td>
+                                    <td>1.24</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>31</strong></td>
+                                    <td><strong>xgboost</strong></td>
+                                    <td>
+                                        
+                                        0.6669
+                                        
+                                    </td>
+                                    <td>0.27</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>32</strong></td>
+                                    <td><strong>random_forest</strong></td>
+                                    <td>
+                                        
+                                        0.6661
+                                        
+                                    </td>
+                                    <td>0.19</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>33</strong></td>
+                                    <td><strong>random_forest</strong></td>
+                                    <td>
+                                        
+                                        0.6661
+                                        
+                                    </td>
+                                    <td>0.07</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>34</strong></td>
+                                    <td><strong>lightgbm</strong></td>
+                                    <td>
+                                        
+                                        0.6661
+                                        
+                                    </td>
+                                    <td>2.83</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>35</strong></td>
+                                    <td><strong>random_forest</strong></td>
+                                    <td>
+                                        
+                                        0.6654
+                                        
+                                    </td>
+                                    <td>0.40</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>36</strong></td>
+                                    <td><strong>lightgbm</strong></td>
+                                    <td>
+                                        
+                                        0.6638
+                                        
+                                    </td>
+                                    <td>6.83</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>37</strong></td>
+                                    <td><strong>lightgbm</strong></td>
+                                    <td>
+                                        
+                                        0.6622
+                                        
+                                    </td>
+                                    <td>5.73</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>38</strong></td>
+                                    <td><strong>xgboost</strong></td>
+                                    <td>
+                                        
+                                        0.6614
+                                        
+                                    </td>
+                                    <td>0.32</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>39</strong></td>
+                                    <td><strong>lightgbm</strong></td>
+                                    <td>
+                                        
+                                        0.6614
+                                        
+                                    </td>
+                                    <td>5.07</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>40</strong></td>
+                                    <td><strong>xgboost</strong></td>
+                                    <td>
+                                        
+                                        0.6591
+                                        
+                                    </td>
+                                    <td>0.07</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>41</strong></td>
+                                    <td><strong>lightgbm</strong></td>
+                                    <td>
+                                        
+                                        0.6591
+                                        
+                                    </td>
+                                    <td>3.03</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>42</strong></td>
+                                    <td><strong>random_forest</strong></td>
+                                    <td>
+                                        
+                                        0.6583
+                                        
+                                    </td>
+                                    <td>0.27</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>43</strong></td>
+                                    <td><strong>random_forest</strong></td>
+                                    <td>
+                                        
+                                        0.6575
+                                        
+                                    </td>
+                                    <td>0.34</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>44</strong></td>
+                                    <td><strong>lightgbm</strong></td>
+                                    <td>
+                                        
+                                        0.6575
+                                        
+                                    </td>
+                                    <td>2.38</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>45</strong></td>
+                                    <td><strong>lightgbm</strong></td>
+                                    <td>
+                                        
+                                        0.6560
+                                        
+                                    </td>
+                                    <td>3.22</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>46</strong></td>
+                                    <td><strong>random_forest</strong></td>
+                                    <td>
+                                        
+                                        0.6528
+                                        
+                                    </td>
+                                    <td>0.07</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>47</strong></td>
+                                    <td><strong>xgboost</strong></td>
+                                    <td>
+                                        
+                                        0.6528
+                                        
+                                    </td>
+                                    <td>0.13</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>48</strong></td>
+                                    <td><strong>lightgbm</strong></td>
+                                    <td>
+                                        
+                                        0.6528
+                                        
+                                    </td>
+                                    <td>2.25</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>49</strong></td>
+                                    <td><strong>lightgbm</strong></td>
+                                    <td>
+                                        
+                                        0.6528
+                                        
+                                    </td>
+                                    <td>2.34</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>50</strong></td>
+                                    <td><strong>xgboost</strong></td>
+                                    <td>
+                                        
+                                        0.6489
+                                        
+                                    </td>
+                                    <td>0.42</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>51</strong></td>
+                                    <td><strong>xgboost</strong></td>
+                                    <td>
+                                        
+                                        0.6458
+                                        
+                                    </td>
+                                    <td>0.07</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>52</strong></td>
+                                    <td><strong>lightgbm</strong></td>
+                                    <td>
+                                        
+                                        0.6442
+                                        
+                                    </td>
+                                    <td>1.48</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>53</strong></td>
+                                    <td><strong>lightgbm</strong></td>
+                                    <td>
+                                        
+                                        0.6388
+                                        
+                                    </td>
+                                    <td>1.37</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>54</strong></td>
+                                    <td><strong>xgboost</strong></td>
+                                    <td>
+                                        
+                                        0.6333
+                                        
+                                    </td>
+                                    <td>0.08</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>55</strong></td>
+                                    <td><strong>lightgbm</strong></td>
+                                    <td>
+                                        
+                                        0.6239
+                                        
+                                    </td>
+                                    <td>4.27</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>56</strong></td>
+                                    <td><strong>lightgbm</strong></td>
+                                    <td>
+                                        
+                                        0.6231
+                                        
+                                    </td>
+                                    <td>0.70</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>57</strong></td>
+                                    <td><strong>lightgbm</strong></td>
+                                    <td>
+                                        
+                                        0.6184
+                                        
+                                    </td>
+                                    <td>2.83</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>58</strong></td>
+                                    <td><strong>xgboost</strong></td>
+                                    <td>
+                                        
+                                        0.6083
+                                        
+                                    </td>
+                                    <td>0.24</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>59</strong></td>
+                                    <td><strong>xgboost</strong></td>
+                                    <td>
+                                        
+                                        0.6067
+                                        
+                                    </td>
+                                    <td>0.52</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>60</strong></td>
+                                    <td><strong>lightgbm</strong></td>
+                                    <td>
+                                        
+                                        0.6036
+                                        
+                                    </td>
+                                    <td>1.48</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>61</strong></td>
+                                    <td><strong>logistic_regression</strong></td>
+                                    <td>
+                                        
+                                        0.6020
+                                        
+                                    </td>
+                                    <td>0.04</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>62</strong></td>
+                                    <td><strong>logistic_regression</strong></td>
+                                    <td>
+                                        
+                                        0.6020
+                                        
+                                    </td>
+                                    <td>0.04</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>63</strong></td>
+                                    <td><strong>logistic_regression</strong></td>
+                                    <td>
+                                        
+                                        0.6020
+                                        
+                                    </td>
+                                    <td>0.04</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>64</strong></td>
+                                    <td><strong>logistic_regression</strong></td>
+                                    <td>
+                                        
+                                        0.6020
+                                        
+                                    </td>
+                                    <td>0.04</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>65</strong></td>
+                                    <td><strong>logistic_regression</strong></td>
+                                    <td>
+                                        
+                                        0.6020
+                                        
+                                    </td>
+                                    <td>0.04</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>66</strong></td>
+                                    <td><strong>logistic_regression</strong></td>
+                                    <td>
+                                        
+                                        0.6020
+                                        
+                                    </td>
+                                    <td>0.04</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>67</strong></td>
+                                    <td><strong>logistic_regression</strong></td>
+                                    <td>
+                                        
+                                        0.6020
+                                        
+                                    </td>
+                                    <td>0.05</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>68</strong></td>
+                                    <td><strong>logistic_regression</strong></td>
+                                    <td>
+                                        
+                                        0.6020
+                                        
+                                    </td>
+                                    <td>0.04</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>69</strong></td>
+                                    <td><strong>logistic_regression</strong></td>
+                                    <td>
+                                        
+                                        0.6020
+                                        
+                                    </td>
+                                    <td>0.04</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>70</strong></td>
+                                    <td><strong>logistic_regression</strong></td>
+                                    <td>
+                                        
+                                        0.5958
+                                        
+                                    </td>
+                                    <td>0.25</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>71</strong></td>
+                                    <td><strong>logistic_regression</strong></td>
+                                    <td>
+                                        
+                                        0.5950
+                                        
+                                    </td>
+                                    <td>0.36</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>72</strong></td>
+                                    <td><strong>logistic_regression</strong></td>
+                                    <td>
+                                        
+                                        0.5950
+                                        
+                                    </td>
+                                    <td>0.03</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>73</strong></td>
+                                    <td><strong>logistic_regression</strong></td>
+                                    <td>
+                                        
+                                        0.5950
+                                        
+                                    </td>
+                                    <td>0.33</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>74</strong></td>
+                                    <td><strong>logistic_regression</strong></td>
+                                    <td>
+                                        
+                                        0.5934
+                                        
+                                    </td>
+                                    <td>0.38</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>75</strong></td>
+                                    <td><strong>logistic_regression</strong></td>
+                                    <td>
+                                        
+                                        0.5926
+                                        
+                                    </td>
+                                    <td>0.02</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>76</strong></td>
+                                    <td><strong>logistic_regression</strong></td>
+                                    <td>
+                                        
+                                        0.5926
+                                        
+                                    </td>
+                                    <td>0.05</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>77</strong></td>
+                                    <td><strong>logistic_regression</strong></td>
+                                    <td>
+                                        
+                                        0.5864
+                                        
+                                    </td>
+                                    <td>0.70</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>78</strong></td>
+                                    <td><strong>logistic_regression</strong></td>
+                                    <td>
+                                        
+                                        0.5817
+                                        
+                                    </td>
+                                    <td>0.34</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>79</strong></td>
+                                    <td><strong>logistic_regression</strong></td>
+                                    <td>
+                                        
+                                        0.5622
+                                        
+                                    </td>
+                                    <td>0.02</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                                <tr >
+                                    <td><strong>80</strong></td>
+                                    <td><strong>logistic_regression</strong></td>
+                                    <td>
+                                        
+                                        0.0063
+                                        
+                                    </td>
+                                    <td>0.01</td>
+                                    <td>
+                                        
+                                        <span style="color: var(--gray-400);">No</span>
+                                        
+                                    </td>
+                                </tr>
+                            
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                
+                <div style="margin-top: 40px;">
+                    <h3>📊 Model Family Performance Summary</h3>
+                    <p style="margin-bottom: 20px; color: var(--gray-600);">This table shows aggregated performance statistics for each model family across all hyperparameter configurations tested.</p>
+                    <div class="table-container">
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Model Family</th>
+                                        <th>Best ACCURACY</th>
+                                        <th>Mean ACCURACY</th>
+                                        <th>Trials</th>
+                                        <th>Avg Time (s)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                
+                                    <tr>
+                                        <td><strong>random_forest</strong></td>
+                                        <td><strong>0.6880</strong></td>
+                                        <td>0.6738</td>
+                                        <td>20</td>
+                                        <td>0.27</td>
+                                    </tr>
+                                
+                                    <tr>
+                                        <td><strong>xgboost</strong></td>
+                                        <td><strong>0.6857</strong></td>
+                                        <td>0.6604</td>
+                                        <td>20</td>
+                                        <td>0.21</td>
+                                    </tr>
+                                
+                                    <tr>
+                                        <td><strong>lightgbm</strong></td>
+                                        <td><strong>0.6677</strong></td>
+                                        <td>0.6511</td>
+                                        <td>20</td>
+                                        <td>2.60</td>
+                                    </tr>
+                                
+                                    <tr>
+                                        <td><strong>logistic_regression</strong></td>
+                                        <td><strong>0.6020</strong></td>
+                                        <td>0.5657</td>
+                                        <td>20</td>
+                                        <td>0.14</td>
+                                    </tr>
+                                
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+            </section>
+
+            <!-- Best Model Details -->
+            <section>
+                <h2>🎯 Best Model Details</h2>
+                <div class="summary-text" style="border-left-color: var(--primary);">
+                    <h3>Best Model Summary</h3>
+<br>
+<p>The AutoML system selected <strong>random_forest</strong> as the best-performing model for this classification task.</p>
+<br>
+<p>This model achieved a <strong>accuracy</strong> score of **0.6880** on the validation set.</p>
+<br>
+<h3># Model Configuration</h3>
+<br>
+<p>The best hyperparameters found were:</p>
+<br>
+<ul>
+<li>**n_estimators**: 300</li>
+<li>**max_depth**: None</li>
+<li>**min_samples_split**: 5</li>
+<li>**min_samples_leaf**: 1</li>
+<li>**max_features**: sqrt</li>
+</ul>
+<br>
+<h3># Training Details</h3>
+<br>
+<ul>
+<li>Training time: 0.39 seconds</li>
+</ul>
+                </div>
+            </section>
+
+            <!-- Feature Importance -->
+            
+            <section>
+                <h2>🔍 Feature Importance</h2>
+                <div class="summary-text" style="border-left-color: var(--accent);">
+                    <h3>Feature Importance Analysis</h3>
+<br>
+<p>The model identified the following 8 feature groups as most important for making predictions:</p>
+<br>
+<p>1. <strong>alcohol</strong> (importance: 0.1618)</p>
+<p>2. <strong>sulphates</strong> (importance: 0.1149)</p>
+<p>3. <strong>total sulfur dioxide</strong> (importance: 0.1067)</p>
+<p>4. <strong>volatile acidity</strong> (importance: 0.1009)</p>
+<p>5. <strong>density</strong> (importance: 0.0902)</p>
+<p>6. <strong>chlorides</strong> (importance: 0.0776)</p>
+<p>7. <strong>pH</strong> (importance: 0.0756)</p>
+<p>8. <strong>fixed acidity</strong> (importance: 0.0722)</p>
+<br>
+<p>*Note: High-cardinality identifier-like columns (e.g., IDs or free-text identifiers) were excluded from this analysis to avoid over-interpreting sparse one-hot categories.*</p>
+<br>
+                </div>
+                
+                <div class="plot-container">
+                    <img src="plots/20260113_190226_feature_importance.png" alt="Feature Importance Plot">
+                </div>
+            </section>
+            
+
+            <!-- Data Visualizations -->
+            <section>
+                <h2>📈 Data Visualizations</h2>
+                
+                
+                <h3>Target Distribution</h3>
+                <div class="plot-container">
+                    <img src="plots/20260113_190226_target_distribution.png" alt="Target Distribution">
+                </div>
+                
+                
+                
+                <h3>Model Performance Comparison</h3>
+                <div class="plot-container">
+                    <img src="plots/20260113_190226_model_comparison.png" alt="Model Comparison">
+                </div>
+                
+                
+                
+                
+                
+                <h3>Confusion Matrix</h3>
+                <div class="plot-container">
+                    <img src="plots/20260113_190226_confusion_matrix.png" alt="Confusion Matrix">
+                </div>
+                
+            </section>
+
+            <!-- Recommendations -->
+            
+            <section>
+                <h2>💡 Recommendations</h2>
+                <div class="summary-text" style="border-left-color: var(--warning);">
+                    <h3>Recommendations for Model Improvement</h3>
+<br>
+<ul>
+<li>**Feature engineering**: Consider creating new features based on domain knowledge or interactions between existing features.</li>
+<li>**Extended hyperparameter tuning**: Consider increasing the number of Optuna trials for more thorough hyperparameter search.</li>
+<li>**Monitor in production**: Once deployed, continuously monitor model performance and retrain periodically with new data.</li>
+</ul>
+                </div>
+            </section>
+            
+
+            <!-- Model Export -->
+            <section>
+                <h2>💾 Model Export</h2>
+                <p style="margin-bottom: 16px;">The trained model and preprocessing pipeline have been saved to:</p>
+                <code style="padding: 8px 12px; display: inline-block;">output/wine_professional/models/20260113_190226_model.joblib</code>
+                
+                <h3>How to Use the Saved Model</h3>
+                <div class="summary-text" style="border-left-color: var(--secondary);">
+                    <p style="margin-bottom: 12px;">To load and use this model for predictions:</p>
+                    <pre><code>import joblib
+import pandas as pd
+
+# Load the model
+pipeline = joblib.load('output/wine_professional/models/20260113_190226_model.joblib')
+
+# Load new data
+new_data = pd.read_csv('your_data.csv')
+
+# Make predictions
+predictions = pipeline.predict(new_data)
+</code></pre>
+                </div>
+            </section>
+        </div>
+
+        <footer>
+            <p>Generated by <strong>AutoML Tabular</strong> v0.1.0</p>
+            <p>Explainable AutoML for Tabular Data</p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,55 @@
+experiment:
+  random_seed: 42
+  test_size: 0.2
+  validation_strategy: "holdout"  # or 'cv'
+  n_splits: 5
+
+search:
+  time_limit_seconds: 900  # 15 minutes
+  max_trials_per_model: 20
+  n_jobs: -1  # use all cores
+
+selection:
+  # Tolerance for "near-tie" detection (e.g., 0.005 = 0.5 percentage points)
+  # Models within this threshold are considered comparable
+  tolerance: 0.005
+  # Strategy: 'most_accurate' (always pick highest metric) or 'simple_if_close' (prefer simpler models in near-ties)
+  strategy: "simple_if_close"
+
+models:
+  classifiers:
+    - name: "logistic_regression"
+      enabled: true
+    - name: "random_forest"
+      enabled: true
+    - name: "xgboost"
+      enabled: true
+    - name: "lightgbm"
+      enabled: true
+  regressors:
+    - name: "linear_regression"
+      enabled: true
+    - name: "random_forest_regressor"
+      enabled: true
+    - name: "xgboost_regressor"
+      enabled: true
+    - name: "lightgbm_regressor"
+      enabled: true
+
+preprocessing:
+  numeric_impute_strategy: "median"
+  categorical_impute_strategy: "most_frequent"
+  scaling: "standard"  # or 'minmax' or 'none'
+  encoding: "onehot"   # or 'target' or 'label'
+  handle_unknown: "ignore"
+
+metrics:
+  classification_primary: "roc_auc"
+  classification_secondary: ["accuracy", "f1"]
+  regression_primary: "rmse"
+  regression_secondary: ["mae", "r2"]
+
+reporting:
+  include_plots: true
+  top_features_to_plot: 5
+  plot_dpi: 100
