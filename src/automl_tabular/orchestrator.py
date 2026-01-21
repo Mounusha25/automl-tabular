@@ -9,7 +9,7 @@ import joblib
 import warnings
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Union
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
@@ -65,6 +65,7 @@ class AutoMLOrchestrator:
         self.searcher = None
         self.leaderboard = None
         self.label_encoder = None  # For classification tasks
+        self.preprocessing_plan = None  # For smart preprocessing explanations
         
         # Results
         self.results = {}
@@ -260,8 +261,38 @@ class AutoMLOrchestrator:
         # Step 3: Preprocessing
         print("\n🔧 Step 3: Preprocessing data...")
         
-        # Remove problematic columns
-        df_clean = remove_constant_columns(df, target_column)
+        # Check if smart preprocessing is enabled
+        enable_smart = self.config.get('preprocessing', {}).get('enable_smart_strategies', False)
+        preprocessing_plan = None
+        
+        if enable_smart:
+            print("   📊 Profiling dataset for intelligent preprocessing...")
+            from automl_tabular.preprocessing import profile_dataset, build_preprocessing_plan
+            
+            # Profile the dataset
+            profile = profile_dataset(df, target_column)
+            
+            # Build preprocessing plan
+            preprocessing_plan = build_preprocessing_plan(
+                profile,
+                config=self.config.get('preprocessing', {}),
+                enable_smart_strategies=True
+            )
+            
+            # Store for report generation
+            self.preprocessing_plan = preprocessing_plan
+            
+            # Log dropped features
+            if preprocessing_plan.dropped_features:
+                print(f"   🗑️  Smart preprocessing dropping: {', '.join(preprocessing_plan.dropped_features)}")
+            
+            # Remove dropped features from df
+            df_clean = df.drop(columns=preprocessing_plan.dropped_features, errors='ignore')
+        else:
+            df_clean = df
+        
+        # Remove problematic columns (original logic)
+        df_clean = remove_constant_columns(df_clean, target_column)
         df_clean = remove_high_missing_columns(df_clean, target_column, threshold=0.95)
         
         print(f"   Features after cleaning: {len(df_clean.columns) - 1}")
@@ -331,7 +362,8 @@ class AutoMLOrchestrator:
             max_trials_per_model=self.config['search']['max_trials_per_model'],
             time_limit_seconds=self.config['search'].get('time_limit_seconds'),
             cv_folds=self.config['experiment']['n_splits'],
-            random_state=random_state
+            random_state=random_state,
+            enable_pruning=self.config['search'].get('enable_pruning', True)
         )
         
         results = self.searcher.search(
@@ -574,6 +606,14 @@ class AutoMLOrchestrator:
         # Get model family summary
         model_family_summary = self.leaderboard.get_model_family_summary()
         
+        # Prepare preprocessing explanations if smart preprocessing was used
+        preprocessing_explanations = []
+        if self.preprocessing_plan is not None:
+            for feat_name in sorted(self.preprocessing_plan.features.keys()):
+                plan = self.preprocessing_plan.features[feat_name]
+                # Include ALL features (even dropped ones - they have important explanations)
+                preprocessing_explanations.append(f"{feat_name}: {plan.explanation}")
+        
         context = report_builder.prepare_context(
             data_info=data_info,
             problem_type=problem_type,
@@ -597,7 +637,8 @@ class AutoMLOrchestrator:
                 'model_name': m.model_name,
                 'score': m.score,
                 'simplicity': MODEL_SIMPLICITY.get(m.model_name, 999)
-            } for m in top_contenders]
+            } for m in top_contenders],
+            preprocessing_explanations=preprocessing_explanations  # Add preprocessing explanations
         )
         
         context['run_id'] = run_id
@@ -619,18 +660,36 @@ class AutoMLOrchestrator:
         print(f"   - Report: {report_path}")
         print("\n")
         
-        # Store results
+        # Store results in contract format for UI
         self.results = {
-            'run_id': run_id,
             'problem_type': problem_type,
-            'best_model_name': best_result.model_name,
-            'best_params': best_result.params,
-            'metric_name': metric_name,
-            'metric_value': best_result.score,
-            'all_metrics': holdout_metrics,
+            'primary_metric_name': metric_name,
+            'recommended_model_name': best_result.model_name,
+            'recommended_metric_value': best_result.score,
+            'report_path': str(report_path),
             'model_path': str(model_path),
-            'report_path': report_path,
-            'leaderboard': self.leaderboard.to_dict(),
+            'plots': plots,
+            'selection': {
+                'tolerance': tolerance,
+                'tolerance_percent': tolerance * 100,
+                'num_top_contenders': selection_info.get('num_contenders', 1),
+                'best_model_name': self.leaderboard.get_best_model().model_name,
+                'best_metric_value': self.leaderboard.get_best_model().score,
+                'recommended_model_name': best_result.model_name,
+                'recommended_metric_value': best_result.score,
+                'performance_diff': selection_info.get('margin', 0.0),
+                'reason': f"because it {'was simpler with comparable performance' if selection_info.get('is_tie') else 'achieved the highest validation ' + metric_name}."
+            },
+            'dataset_info': {
+                'n_rows': data_info.get('n_rows', 0),
+                'n_features': data_info.get('n_features', 0),
+                'target': target_column
+            },
+            'warnings': warnings_list,
+            'total_models': len(results),
+            'leaderboard': self.leaderboard.to_dict() if hasattr(self.leaderboard.to_dict(), 'get') else (self.leaderboard.to_dict().get('records', []) if isinstance(self.leaderboard.to_dict(), dict) else []),
+            'run_id': run_id,
+            'all_metrics': holdout_metrics,
             'feature_importance': feature_importance_df.to_dict(orient='records')
         }
         
@@ -638,33 +697,55 @@ class AutoMLOrchestrator:
 
 
 def run_automl_job(
-    data_path: str,
+    data,
     target_column: str,
     output_dir: str = "output",
+    task: Optional[str] = None,
+    metric: Optional[str] = None,
+    time_budget: Optional[int] = None,
     config: Optional[Dict] = None,
-    metric: str = "auto",
     report_name: Optional[str] = None
 ) -> Dict[str, Any]:
     """
     Convenience function to run AutoML pipeline.
     
     Args:
-        data_path: Path to CSV data file
+        data: Path to CSV file (str) or pandas DataFrame
         target_column: Name of target column
         output_dir: Directory for outputs
+        task: Optional task override ("auto" | "binary" | "multiclass" | "regression")
+        metric: Optional primary metric ('auto' or specific metric name like 'roc_auc', 'accuracy', 'rmse')
+        time_budget: Optional time budget in seconds
         config: Optional configuration dictionary
-        metric: Primary metric ('auto' or specific metric name)
         report_name: Optional custom report name
         
     Returns:
-        Dictionary with results and paths
+        Dictionary with results and paths matching the UI contract
     """
+    # Merge time_budget into config if provided
+    if config is None:
+        config = {}
+    if time_budget is not None and time_budget > 0:
+        if 'search' not in config:
+            config['search'] = {}
+        config['search']['time_limit_seconds'] = time_budget
+    
     orchestrator = AutoMLOrchestrator(config=config)
+    
+    # Handle both DataFrame and file path
+    if isinstance(data, pd.DataFrame):
+        import tempfile
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
+            data.to_csv(f.name, index=False)
+            data_path = f.name
+    else:
+        data_path = data
+    
     return orchestrator.run(
         data_path=data_path,
         target_column=target_column,
         output_dir=output_dir,
-        metric=metric,
+        metric=metric if metric else "auto",
         report_name=report_name
     )
 

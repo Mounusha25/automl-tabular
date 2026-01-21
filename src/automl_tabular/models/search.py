@@ -6,9 +6,11 @@ from typing import Dict, List, Any, Optional, Callable
 from dataclasses import dataclass
 import numpy as np
 from sklearn.model_selection import cross_val_score
+from sklearn.metrics import get_scorer
 
 try:
     import optuna
+    from optuna.pruners import MedianPruner
     HAS_OPTUNA = True
     optuna.logging.set_verbosity(optuna.logging.WARNING)
 except ImportError:
@@ -37,7 +39,8 @@ class ModelSearcher:
         max_trials_per_model: int = 20,
         time_limit_seconds: Optional[int] = None,
         cv_folds: int = 5,
-        random_state: int = 42
+        random_state: int = 42,
+        enable_pruning: bool = True
     ):
         """
         Initialize model searcher.
@@ -47,17 +50,43 @@ class ModelSearcher:
             metric_func: Function to compute metric (higher is better)
             max_trials_per_model: Maximum trials per model type
             time_limit_seconds: Time limit for entire search
-            cv_folds: Number of cross-validation folds
+            cv_folds: Number of cross-validation folds (auto-adjusted based on dataset size)
             random_state: Random seed
+            enable_pruning: Enable Optuna MedianPruner for early stopping (default: True)
         """
         self.problem_type = problem_type
         self.metric_func = metric_func
         self.max_trials_per_model = max_trials_per_model
         self.time_limit_seconds = time_limit_seconds
-        self.cv_folds = cv_folds
+        self.cv_folds_config = cv_folds  # Store config value
         self.random_state = random_state
+        self.enable_pruning = enable_pruning
         self.results: List[TrialResult] = []
         self.start_time = None
+    
+    def _get_cv_folds(self, n_samples: int) -> int:
+        """
+        Determine number of CV folds based on dataset size.
+        
+        Heuristic (safe & explainable):
+        - If dataset size < 5,000 → use configured folds (typically 3)
+        - If 5,000-50,000 → 2-fold CV
+        - If > 50,000 → holdout only (1-fold)
+        
+        This keeps results stable while saving time on larger datasets.
+        
+        Args:
+            n_samples: Number of samples in training set
+            
+        Returns:
+            Number of CV folds to use
+        """
+        if n_samples < 5000:
+            return self.cv_folds_config
+        elif n_samples < 50000:
+            return 2
+        else:
+            return 1  # Holdout only for very large datasets
     
     def search(
         self,
@@ -150,16 +179,58 @@ class ModelSearcher:
             if model is None:
                 raise optuna.TrialPruned()
             
-            # Cross-validation
-            scores = cross_val_score(
-                model, X_train, y_train,
-                cv=self.cv_folds,
-                scoring=self.metric_func,
-                n_jobs=-1
-            )
+            # Dynamic CV folds based on dataset size
+            # Handle both dense and sparse matrices
+            n_samples = X_train.shape[0]
+            cv_folds = self._get_cv_folds(n_samples)
+            
+            # Cross-validation with per-fold reporting for pruning
+            from sklearn.model_selection import cross_validate
+            
+            start_time = time.time()
+            
+            # If pruning enabled, report per-fold scores
+            if self.enable_pruning and cv_folds > 1:
+                # Manual CV with per-fold reporting
+                from sklearn.model_selection import StratifiedKFold, KFold
+                
+                if self.problem_type == 'classification':
+                    splitter = StratifiedKFold(n_splits=cv_folds, shuffle=True, random_state=self.random_state)
+                else:
+                    splitter = KFold(n_splits=cv_folds, shuffle=True, random_state=self.random_state)
+                
+                fold_scores = []
+                for fold_idx, (train_idx, val_idx) in enumerate(splitter.split(X_train, y_train)):
+                    X_fold_train, X_fold_val = X_train[train_idx], X_train[val_idx]
+                    y_fold_train, y_fold_val = y_train[train_idx], y_train[val_idx]
+                    
+                    # Train on this fold
+                    model.fit(X_fold_train, y_fold_train)
+                    
+                    # Evaluate
+                    scorer = get_scorer(self.metric_func)
+                    fold_score = scorer(model, X_fold_val, y_fold_val)
+                    fold_scores.append(fold_score)
+                    
+                    # Report intermediate value for pruning
+                    trial.report(np.mean(fold_scores), step=fold_idx)
+                    
+                    # Check if trial should be pruned
+                    if trial.should_prune():
+                        raise optuna.TrialPruned()
+                
+                score = np.mean(fold_scores)
+            else:
+                # Standard cross_val_score (no per-fold reporting)
+                scores = cross_val_score(
+                    model, X_train, y_train,
+                    cv=cv_folds,
+                    scoring=self.metric_func,
+                    n_jobs=-1
+                )
+                score = scores.mean()
             
             train_time = time.time() - start_time
-            score = scores.mean()
             
             # Store result
             self.results.append(TrialResult(
@@ -172,10 +243,19 @@ class ModelSearcher:
             
             return score
         
-        # Create study
+        # Create study with optional pruning
+        if self.enable_pruning:
+            pruner = MedianPruner(
+                n_startup_trials=5,  # Wait for 5 trials before pruning
+                n_warmup_steps=1      # Start pruning after 1 fold
+            )
+        else:
+            pruner = optuna.pruners.NopPruner()
+        
         study = optuna.create_study(
             direction='maximize',
-            sampler=optuna.samplers.TPESampler(seed=self.random_state)
+            sampler=optuna.samplers.TPESampler(seed=self.random_state),
+            pruner=pruner
         )
         
         # Run optimization

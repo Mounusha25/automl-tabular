@@ -17,15 +17,32 @@ The focus is not just on raw metric, but also on **explainability**, **data qual
 
 ### 🌐 Interactive Web App
 
-Try the **live Streamlit demo** (once deployed):
-- Upload your own CSV or try example datasets
-- Configure target column and metric
-- Run AutoML and see results instantly
-- Download trained models
+Try the **Streamlit web interface** (available in two flavors):
 
-👉 **[Launch Demo](https://automl-tabular-demo.streamlit.app)** (coming soon)
+1. **Production UI** (`ui_streamlit.py`) - Clean, production-ready interface
+   - Sample datasets (Titanic, Wine Quality, Housing, Adult Income)
+   - Embedded HTML report preview
+   - Downloadable models and reports
+   - Perfect for deployment on Streamlit Cloud
 
-_To deploy your own: See [STREAMLIT_DEPLOY.md](STREAMLIT_DEPLOY.md)_
+2. **Enhanced UI** (`streamlit_app.py`) - Feature-rich with modern design
+   - Custom gradient theme and visualizations
+   - Interactive Plotly charts
+   - Real-time progress tracking
+   - Comprehensive data preview
+
+**Run locally:**
+```bash
+# Production UI (recommended for deployment)
+streamlit run app/ui_streamlit.py
+
+# Enhanced UI (great for local demos)
+streamlit run app/streamlit_app.py
+```
+
+👉 **[Launch Live Demo](https://automl-tabular-demo.streamlit.app)** (coming soon)
+
+_For deployment guide and UI details: See [STREAMLIT_UI_GUIDE.md](STREAMLIT_UI_GUIDE.md)_
 
 ### 📄 Generated HTML Reports
 
@@ -66,6 +83,12 @@ Each AutoML run produces a comprehensive, professional HTML report with:
 - **Robust validation**
   - 80/20 train/validation split (stratified for classification)
   - 3‑fold cross‑validation inside the hyperparameter search
+- **Performance optimizations** (~1.4x speedup):
+  - Optuna MedianPruner for early trial termination
+  - Dynamic CV folds (adjusts by dataset size)
+  - Sparse matrix support for high-cardinality categoricals
+  - Float32 precision for faster computation
+  - See [PERFORMANCE.md](PERFORMANCE.md) for details
 
 ### 🧠 Smart Model Selection
 

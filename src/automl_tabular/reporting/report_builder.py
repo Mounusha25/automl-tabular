@@ -88,7 +88,8 @@ class ReportBuilder:
         model_path: str = "",
         selection_info: Dict = None,
         top_contenders: List[Dict] = None,
-        model_family_summary: List[Dict] = None
+        model_family_summary: List[Dict] = None,
+        preprocessing_explanations: List[str] = None
     ) -> Dict:
         """
         Prepare context dictionary for report template.
@@ -117,6 +118,7 @@ class ReportBuilder:
         selection_info = selection_info or {'is_tie': False}
         top_contenders = top_contenders or []
         model_family_summary = model_family_summary or []
+        preprocessing_explanations = preprocessing_explanations or []
         
         # Convert plot paths to relative paths for HTML
         relative_plots = {}
@@ -171,6 +173,9 @@ class ReportBuilder:
             
             # Model path
             'model_path': model_path,
+            
+            # Preprocessing explanations
+            'preprocessing_explanations': preprocessing_explanations,
         }
         
         return context

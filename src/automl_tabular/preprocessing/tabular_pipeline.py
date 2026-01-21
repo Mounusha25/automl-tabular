@@ -2,6 +2,7 @@
 
 import pandas as pd
 import numpy as np
+import scipy.sparse
 from typing import Dict, List, Optional
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
@@ -56,10 +57,14 @@ class TabularPreprocessor:
             transformers.append(('cat', categorical_transformer, categorical_features))
         
         # Combine transformers
+        # If using sparse matrices, keep them sparse through the pipeline
+        use_sparse = self.config.get('use_sparse_matrices', True)
+        sparse_threshold = 0.3 if use_sparse else 0  # Keep sparse if >30% sparse
+        
         preprocessor = ColumnTransformer(
             transformers=transformers,
             remainder='drop',  # Drop any columns not specified
-            sparse_threshold=0  # Return dense array
+            sparse_threshold=sparse_threshold
         )
         
         self.pipeline = Pipeline([
@@ -99,11 +104,13 @@ class TabularPreprocessor:
         handle_unknown = self.config.get('handle_unknown', 'ignore')
         
         if encoding == 'onehot':
+            # Use sparse matrices for efficiency (especially with high cardinality)
+            use_sparse = self.config.get('use_sparse_matrices', True)
             steps.append((
                 'encoder',
                 OneHotEncoder(
                     handle_unknown=handle_unknown,
-                    sparse_output=False,
+                    sparse_output=use_sparse,
                     drop='first'  # Avoid dummy variable trap
                 )
             ))
@@ -120,12 +127,19 @@ class TabularPreprocessor:
             y: Target (optional, for target encoding)
             
         Returns:
-            Transformed feature array
+            Transformed feature array (optionally as float32 for efficiency)
         """
         if self.pipeline is None:
             raise ValueError("Pipeline not built. Call build_pipeline() first.")
         
-        return self.pipeline.fit_transform(X, y)
+        X_transformed = self.pipeline.fit_transform(X, y)
+        
+        # Convert to float32 for memory/speed (unless sparse)
+        use_float32 = self.config.get('use_float32', True)
+        if use_float32 and not isinstance(X_transformed, (scipy.sparse.spmatrix, scipy.sparse.sparray)):
+            X_transformed = X_transformed.astype(np.float32)
+        
+        return X_transformed
     
     def transform(self, X: pd.DataFrame) -> np.ndarray:
         """
@@ -135,12 +149,19 @@ class TabularPreprocessor:
             X: Input features
             
         Returns:
-            Transformed feature array
+            Transformed feature array (optionally as float32 for efficiency)
         """
         if self.pipeline is None:
             raise ValueError("Pipeline not built. Call build_pipeline() first.")
         
-        return self.pipeline.transform(X)
+        X_transformed = self.pipeline.transform(X)
+        
+        # Convert to float32 for memory/speed (unless sparse)
+        use_float32 = self.config.get('use_float32', True)
+        if use_float32 and not isinstance(X_transformed, (scipy.sparse.spmatrix, scipy.sparse.sparray)):
+            X_transformed = X_transformed.astype(np.float32)
+        
+        return X_transformed
     
     def get_feature_names(self) -> List[str]:
         """

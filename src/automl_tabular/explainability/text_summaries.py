@@ -184,8 +184,9 @@ def generate_recommendations(
     if best_result.model_name in ['logistic_regression', 'linear_regression']:
         summary.append(
             "- **Tree-based alternatives**: Tree-based models (RandomForest, XGBoost, LightGBM) "
-            "achieved slightly higher ROC_AUC in the search and may capture more complex patterns, "
-            "at the cost of interpretability and deployment simplicity."
+            "achieved similar but slightly lower scores in this run. They may capture more complex "
+            "patterns at the cost of interpretability and deployment simplicity, and can be good "
+            "options to explore if you prioritize non-linear decision boundaries."
         )
     
     # Hyperparameter tuning

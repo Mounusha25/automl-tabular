@@ -547,7 +547,11 @@
                         <li><strong>Primary Metric:</strong> {{ metric_name|upper }} on the validation set</li>
                         <li><strong>Cross-Validation:</strong> {{ cv_folds|default("3") }}-fold CV during hyperparameter search</li>
                         <li><strong>Hyperparameter Search:</strong> Optuna with {{ total_trials|default(total_models_tried) }} trials across {{ num_model_families|default(4) }} model families</li>
+                        {% if preprocessing_explanations %}
+                        <li><strong>Preprocessing:</strong> Profile-based imputation, outlier clipping, and scaling for numeric features; most-frequent + categorical encoding for categoricals (see "Preprocessing Decisions" below for per-feature details)</li>
+                        {% else %}
                         <li><strong>Preprocessing:</strong> Median imputation for numeric features, most-frequent imputation + one-hot encoding for categorical features</li>
+                        {% endif %}
                         <li><strong>Model Selection:</strong> Tolerance-based selection ({{ "%.1f"|format(selection_info.tolerance_percent) }}%) with simplicity tie-breaking</li>
                     </ul>
                 </div>
@@ -577,6 +581,18 @@
                     <ul>
                     {% for warning in warnings %}
                         <li>{{ warning }}</li>
+                    {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                
+                {% if preprocessing_explanations %}
+                <div class="alert-box" style="margin-top: 24px; background-color: var(--primary-light); border-left: 4px solid var(--primary);">
+                    <h4>🧪 Preprocessing Decisions</h4>
+                    <p style="margin-bottom: 12px; color: var(--gray-700);">The following per-feature preprocessing strategies were applied based on dataset-specific distributions:</p>
+                    <ul style="margin-left: 20px; color: var(--gray-700);">
+                    {% for explanation in preprocessing_explanations %}
+                        <li style="margin-bottom: 8px;">{{ explanation }}</li>
                     {% endfor %}
                     </ul>
                 </div>

@@ -8,6 +8,10 @@ search:
   time_limit_seconds: 900  # 15 minutes
   max_trials_per_model: 20
   n_jobs: -1  # use all cores
+  
+  # Performance optimizations
+  enable_pruning: true  # Enable Optuna MedianPruner for early stopping
+  auto_adjust_cv_folds: true  # Reduce CV folds for large datasets
 
 selection:
   # Tolerance for "near-tie" detection (e.g., 0.005 = 0.5 percentage points)
@@ -37,11 +41,24 @@ models:
       enabled: true
 
 preprocessing:
+  # Smart preprocessing: profile data and choose strategies intelligently
+  enable_smart_strategies: false  # Set to true for intelligent preprocessing
+  
+  # Performance optimizations
+  use_sparse_matrices: true  # Use sparse matrices for one-hot encoding (faster for categorical-heavy data)
+  use_float32: true  # Use float32 instead of float64 (faster, less memory)
+  
+  # Fallback strategies (used when smart_strategies=false or as defaults)
   numeric_impute_strategy: "median"
   categorical_impute_strategy: "most_frequent"
   scaling: "standard"  # or 'minmax' or 'none'
   encoding: "onehot"   # or 'target' or 'label'
   handle_unknown: "ignore"
+  
+  # Smart preprocessing thresholds
+  high_missing_threshold: 0.95  # Drop features with >95% missing
+  drop_high_missing_features: false  # If true, drop features above threshold
+  outlier_iqr_multiplier: 1.5  # IQR multiplier for outlier detection
 
 metrics:
   classification_primary: "roc_auc"
