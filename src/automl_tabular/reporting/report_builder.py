@@ -1,6 +1,7 @@
 """Report generation utilities."""
 
 import os
+import base64
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, List, Optional
@@ -120,13 +121,19 @@ class ReportBuilder:
         model_family_summary = model_family_summary or []
         preprocessing_explanations = preprocessing_explanations or []
         
-        # Convert plot paths to relative paths for HTML
-        relative_plots = {}
+        # Convert plot paths to base64 data URIs for embedding in HTML
+        embedded_plots = {}
         for key, plot_path in plots.items():
-            if plot_path:
-                # Convert to relative path from report directory
-                plot_path_obj = Path(plot_path)
-                relative_plots[key] = f"plots/{plot_path_obj.name}"
+            if plot_path and os.path.exists(plot_path):
+                try:
+                    with open(plot_path, 'rb') as f:
+                        img_data = base64.b64encode(f.read()).decode('utf-8')
+                        embedded_plots[key] = f"data:image/png;base64,{img_data}"
+                except Exception as e:
+                    print(f"Warning: Could not embed plot {key}: {e}")
+                    embedded_plots[key] = None
+            else:
+                embedded_plots[key] = None
         
         # Count number of model families
         num_model_families = len(set(row['model'] for row in leaderboard_data))
@@ -163,12 +170,12 @@ class ReportBuilder:
             'feature_importance_summary': self._markdown_to_html(feature_importance_summary),
             'recommendations': self._markdown_to_html(recommendations),
             
-            # Plots (using relative paths)
-            'feature_importance_plot': relative_plots.get('feature_importance'),
-            'target_distribution_plot': relative_plots.get('target_distribution'),
-            'model_comparison_plot': relative_plots.get('model_comparison'),
-            'missing_data_plot': relative_plots.get('missing_data'),
-            'confusion_matrix_plot': relative_plots.get('confusion_matrix'),
+            # Plots (using base64 embedded images)
+            'feature_importance_plot': embedded_plots.get('feature_importance'),
+            'target_distribution_plot': embedded_plots.get('target_distribution'),
+            'model_comparison_plot': embedded_plots.get('model_comparison'),
+            'missing_data_plot': embedded_plots.get('missing_data'),
+            'confusion_matrix_plot': embedded_plots.get('confusion_matrix'),
             'additional_plots': [],
             
             # Model path

@@ -15,34 +15,29 @@ The focus is not just on raw metric, but also on **explainability**, **data qual
 
 ## Demo
 
-### 🌐 Interactive Web App
+### 🌐 Interactive Web Demo
 
-Try the **Streamlit web interface** (available in two flavors):
+**30-second recruiter-friendly demo** - See AutoML in action:
 
-1. **Production UI** (`ui_streamlit.py`) - Clean, production-ready interface
-   - Sample datasets (Titanic, Wine Quality, Housing, Adult Income)
-   - Embedded HTML report preview
-   - Downloadable models and reports
-   - Perfect for deployment on Streamlit Cloud
-
-2. **Enhanced UI** (`streamlit_app.py`) - Feature-rich with modern design
-   - Custom gradient theme and visualizations
-   - Interactive Plotly charts
-   - Real-time progress tracking
-   - Comprehensive data preview
-
-**Run locally:**
 ```bash
-# Production UI (recommended for deployment)
-streamlit run app/ui_streamlit.py
+# Install Streamlit (one-time)
+pip3 install streamlit --user
 
-# Enhanced UI (great for local demos)
-streamlit run app/streamlit_app.py
+# Run demo
+python3 -m streamlit run demo_streamlit.py
 ```
 
-👉 **[Launch Live Demo](https://automl-tabular-demo.streamlit.app)** (coming soon)
+**What you'll see:**
+- ✨ Modern, professional UI with gradient design
+- 🎯 One-click AutoML on Titanic dataset
+- ⚡ Real-time progress tracking
+- 📊 Model leaderboard with all trials
+- 📄 Embedded HTML report preview
+- 📥 Download trained model + report
 
-_For deployment guide and UI details: See [STREAMLIT_UI_GUIDE.md](STREAMLIT_UI_GUIDE.md)_
+**Perfect for:** Interviews, portfolio showcase, live demonstrations
+
+_Full demo guide: See [STREAMLIT_DEMO.md](STREAMLIT_DEMO.md)_
 
 ### 📄 Generated HTML Reports
 
