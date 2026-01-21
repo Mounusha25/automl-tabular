@@ -9,7 +9,7 @@ It handles **binary classification**, **multiclass classification**, and **regre
 
 The focus is not just on raw metric, but also on **explainability**, **data quality**, and **sane model selection**.
 
-> 🌐 **[Try Live Demo](https://automl-tabular-demo.streamlit.app)** (coming soon) | 📊 **[View Sample Reports](examples/sample_reports/)** | 🔗 **[GitHub](https://github.com/Mounusha25/automl-tabular)**
+> 🌐 **[Try Live Demo](https://automl-tabular.streamlit.app/)** | 📊 **[View Sample Reports](examples/sample_reports/)** | 🔗 **[GitHub](https://github.com/Mounusha25/automl-tabular)**
 
 ---
 
